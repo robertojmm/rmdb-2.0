@@ -1,0 +1,14 @@
+{
+  "extends": "@some-project/ts-config/tsconfig.base.node.json",
+  "compilerOptions": {
+    "types": ["bun-types"],
+    "baseUrl": ".",
+    "paths": {
+      "@db": ["src/db/index.ts"],
+      "@db/*": ["src/db/*"],
+      "@movies": ["src/movies/index.ts"],
+      "@movies/*": ["src/movies/*"]
+    }
+  },
+  "include": ["src/**/*", "drizzle.config.ts"]
+}

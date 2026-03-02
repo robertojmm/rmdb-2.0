@@ -1,0 +1,26 @@
+{
+  "name": "some-project",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "workspaces": ["apps/*", "libs/*"],
+  "scripts": {
+    "api:dev": "bun run --cwd apps/api dev",
+    "api:build": "bun run --cwd apps/api build",
+    "api:push": "bun run --cwd apps/api push",
+    "desktop:dev": "bun run --cwd apps/desktop tauri dev",
+    "desktop:build": "bun run --cwd apps/desktop tauri build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "bun@1.3.10",
+  "devDependencies": {
+    "@some-project/ts-config": "workspace:*",
+    "eslint": "^10.0.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1"
+  }
+}

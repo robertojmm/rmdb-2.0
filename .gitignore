@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+dist-ssr/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+apps/api/data/
+
+# Drizzle generated migrations
+drizzle/
+
+# Rust / Tauri build artifacts (can be several GB)
+apps/desktop/src-tauri/target/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.sw?

@@ -1,0 +1,35 @@
+{
+  "name": "@some-project/desktop",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@elysiajs/eden": "latest",
+    "@some-project/api": "workspace:*",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-opener": "^2",
+    "elysia": "latest",
+    "i18next": "^25.8.13",
+    "lucide-react": "^0.576.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-i18next": "^16.5.4",
+    "react-router-dom": "^7.13.1"
+  },
+  "devDependencies": {
+    "@some-project/ts-config": "workspace:*",
+    "@tailwindcss/vite": "^4.2.1",
+    "@tauri-apps/cli": "^2",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.6.0",
+    "tailwindcss": "^4.2.1",
+    "vite": "^7.0.4"
+  }
+}

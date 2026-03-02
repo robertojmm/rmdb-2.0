@@ -1,0 +1,22 @@
+{
+  "nav": {
+    "library": "Library",
+    "addMovie": "Add Movie",
+    "settings": "Settings"
+  },
+  "library": {
+    "title": "My Library",
+    "empty": "No movies yet. Add your first one!"
+  },
+  "addMovie": {
+    "title": "Add Movie"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "languages": {
+      "en": "English",
+      "es": "Spanish"
+    }
+  }
+}

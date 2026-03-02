@@ -1,0 +1,30 @@
+{
+  "name": "@some-project/api",
+  "description": "",
+  "version": "1.0.0",
+  "author": "",
+  "dependencies": {
+    "drizzle-orm": "^0.44.2",
+    "elysia": "latest"
+  },
+  "devDependencies": {
+    "@some-project/ts-config": "workspace:*",
+    "bun-types": "latest",
+    "drizzle-kit": "^0.31.1"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir ./dist --target bun",
+    "dev": "bun --watch src/index.ts",
+    "generate": "drizzle-kit generate",
+    "push": "drizzle-kit push",
+    "migrate": "drizzle-kit migrate",
+    "setup": "bun run generate && bun run migrate && bun run build",
+    "seed": "bun src/seeds/index.ts",
+    "studio": "drizzle-kit studio"
+  }
+}
