@@ -11,7 +11,38 @@
     "error": "No se pudo conectar con la API."
   },
   "addMovie": {
-    "title": "Añadir película"
+    "title": "Añadir película",
+    "subtitle": "Elige cómo quieres añadir una película a tu biblioteca.",
+    "apiSourceLabel": "Base de datos de películas",
+    "apiSourcePlaceholder": "Selecciona una base de datos...",
+    "apiSourceSearchPlaceholder": "Buscar bases de datos...",
+    "apiSourceEmpty": "No se encontraron resultados",
+    "apiSourceNotConfigured": "Sin configurar",
+    "manual": {
+      "title": "Añadir manualmente",
+      "desc": "Introduce todos los detalles de la película usando el formulario.",
+      "addToLibrary": "Añadir a la biblioteca",
+      "clear": "Limpiar"
+    },
+    "api": {
+      "title": "Añadir mediante API",
+      "desc": "Obtén los datos automáticamente desde una base de datos online.",
+      "movieLabel": "Nombre de la película",
+      "searchBtn": "Buscar",
+      "noResults": "No se encontraron resultados",
+      "addBtn": "Añadir",
+      "searchError": "Error en la búsqueda. Por favor, inténtalo de nuevo."
+    },
+    "search": {
+      "title": "Escanear disco local",
+      "desc": "Escanea tu disco duro en busca de ficheros de película en las carpetas configuradas.",
+      "foldersLabel": "Carpetas a escanear",
+      "noFolders": "No hay carpetas configuradas. Ve a Configuración para añadirlas.",
+      "startScan": "Iniciar escaneo",
+      "step1": "Buscando ficheros de película",
+      "step2": "Identificando películas con la API",
+      "done": "Completado"
+    }
   },
   "settings": {
     "title": "Configuración",
@@ -25,6 +56,22 @@
       "system": "Sistema",
       "light": "Claro",
       "dark": "Oscuro"
+    },
+    "movieApis": {
+      "title": "Bases de datos de películas",
+      "colName": "Nombre",
+      "colStatus": "Estado",
+      "free": "Gratuita",
+      "configured": "Configurada",
+      "notConfigured": "Sin configurar",
+      "configure": "Configurar",
+      "modal": {
+        "title": "Configurar API",
+        "apiKeyLabel": "API Key",
+        "apiKeyPlaceholder": "Pega aquí tu API key...",
+        "save": "Guardar",
+        "cancel": "Cancelar"
+      }
     },
     "apiStatus": {
       "label": "API",

@@ -11,7 +11,38 @@
     "error": "Could not connect to the API."
   },
   "addMovie": {
-    "title": "Add Movie"
+    "title": "Add Movie",
+    "subtitle": "Choose how you want to add a movie to your library.",
+    "apiSourceLabel": "Movie database",
+    "apiSourcePlaceholder": "Select a database...",
+    "apiSourceSearchPlaceholder": "Search databases...",
+    "apiSourceEmpty": "No databases found",
+    "apiSourceNotConfigured": "Not configured",
+    "manual": {
+      "title": "Add manually",
+      "desc": "Enter all movie details yourself using the built-in form.",
+      "addToLibrary": "Add to library",
+      "clear": "Clear"
+    },
+    "api": {
+      "title": "Add through API",
+      "desc": "Fetch movie data automatically from an online database.",
+      "movieLabel": "Movie name",
+      "searchBtn": "Search",
+      "noResults": "No results found",
+      "addBtn": "Add",
+      "searchError": "Search failed. Please try again."
+    },
+    "search": {
+      "title": "Scan local drive",
+      "desc": "Scan your hard drive for movie files across your configured folders.",
+      "foldersLabel": "Folders to scan",
+      "noFolders": "No folders configured. Go to Settings to add scan folders.",
+      "startScan": "Start scan",
+      "step1": "Scanning for movie files",
+      "step2": "Matching movies with API",
+      "done": "Done"
+    }
   },
   "settings": {
     "title": "Settings",
@@ -25,6 +56,22 @@
       "system": "System",
       "light": "Light",
       "dark": "Dark"
+    },
+    "movieApis": {
+      "title": "Movie Databases",
+      "colName": "Name",
+      "colStatus": "Status",
+      "free": "Free",
+      "configured": "Configured",
+      "notConfigured": "Not configured",
+      "configure": "Configure",
+      "modal": {
+        "title": "Configure API",
+        "apiKeyLabel": "API Key",
+        "apiKeyPlaceholder": "Paste your API key here...",
+        "save": "Save",
+        "cancel": "Cancel"
+      }
     },
     "apiStatus": {
       "label": "API",
