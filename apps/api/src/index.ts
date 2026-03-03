@@ -5,12 +5,14 @@ import { moviesRouter } from '@movies/movies.router'
 import { apiSourcesRouter } from '@api-sources/api-sources.router'
 import { scanFoldersRouter } from '@scan-folders/scan-folders.router'
 import { version } from '../package.json'
+import { config } from './config'
 
 const app = new Elysia()
   .use(cors({
     origin: "*"
   }))
   .get('/health', () => ({ status: 'ok', version }))
+  .get('/config', () => ({ dbPath: config.dbPath }))
   .get('/assets/default_poster', () => Bun.file(join(import.meta.dir, '../public/default_poster.jpg')))
   .use(moviesRouter)
   .use(apiSourcesRouter)

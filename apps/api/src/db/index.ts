@@ -4,9 +4,9 @@ import { migrate } from 'drizzle-orm/bun-sqlite/migrator'
 import { existsSync, mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import * as schema from './schema'
+import { config } from '../config'
 
-const dbUrl = process.env['SQLITE_PATH']
-if (!dbUrl) throw new Error('SQLITE_PATH is not defined in .env')
+const dbUrl = config.dbPath
 
 const dbDir = dirname(dbUrl)
 if (!existsSync(dbDir)) {

@@ -4,6 +4,7 @@ import { Layout } from './components/layout/Layout'
 import { AddMoviePage } from './pages/add-movie/AddMoviePage'
 import { LibraryPage } from './pages/library/LibraryPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
+import { AboutPage } from './pages/about/AboutPage'
 import './App.css'
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
             <Route index element={<LibraryPage />} />
             <Route path="add-movie" element={<AddMoviePage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="about" element={<AboutPage />} />
           </Route>
         </Routes>
       </HashRouter>

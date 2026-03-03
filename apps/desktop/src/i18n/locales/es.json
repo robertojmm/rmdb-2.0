@@ -2,7 +2,8 @@
   "nav": {
     "library": "Biblioteca",
     "addMovie": "Añadir película",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "about": "Acerca de"
   },
   "library": {
     "title": "Mi biblioteca",
@@ -79,11 +80,23 @@
       "add": "Añadir carpeta",
       "remove": "Eliminar"
     },
+    "dataDir": {
+      "title": "Directorio de datos",
+      "description": "Ubicación de la base de datos y los archivos multimedia.",
+      "change": "Cambiar",
+      "restartNotice": "Reinicia la aplicación para aplicar el nuevo directorio de datos.",
+      "restartNow": "Reiniciar ahora"
+    },
     "apiStatus": {
       "label": "API",
       "checking": "Comprobando...",
       "online": "En línea",
       "offline": "Sin conexión"
     }
+  },
+  "about": {
+    "title": "Acerca de",
+    "description": "Un gestor de biblioteca de películas para tu colección local.",
+    "builtWith": "Hecho con"
   }
 }

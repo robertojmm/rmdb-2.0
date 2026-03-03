@@ -2,7 +2,8 @@
   "nav": {
     "library": "Library",
     "addMovie": "Add Movie",
-    "settings": "Settings"
+    "settings": "Settings",
+    "about": "About"
   },
   "library": {
     "title": "My Library",
@@ -79,11 +80,23 @@
       "add": "Add folder",
       "remove": "Remove"
     },
+    "dataDir": {
+      "title": "Data Directory",
+      "description": "Location of the database and media files.",
+      "change": "Change",
+      "restartNotice": "Restart the app to apply the new data directory.",
+      "restartNow": "Restart now"
+    },
     "apiStatus": {
       "label": "API",
       "checking": "Checking...",
       "online": "Online",
       "offline": "Offline"
     }
+  },
+  "about": {
+    "title": "About",
+    "description": "A personal movie library manager for your local collection.",
+    "builtWith": "Built with"
   }
 }

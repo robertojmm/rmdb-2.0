@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Settings2, X, Check, FolderPlus, Trash2 } from 'lucide-react'
+import { Settings2, X, Check, FolderPlus, Trash2, FolderOpen, RotateCcw } from 'lucide-react'
 import { open } from '@tauri-apps/plugin-dialog'
+import { invoke } from '@tauri-apps/api/core'
 import { type Theme, useTheme } from '../../context/ThemeContext'
 import { api } from '../../lib/api'
 
@@ -39,6 +40,8 @@ type ScanFolder = {
 
 type ConfiguringModal = { source: ApiSource; apiKeyInput: string }
 
+type AppConfig = { dbPath: string; dataDir: string }
+
 export function SettingsPage() {
   const { t, i18n } = useTranslation()
   const { theme, setTheme } = useTheme()
@@ -48,6 +51,9 @@ export function SettingsPage() {
   const [modal, setModal] = useState<ConfiguringModal | null>(null)
   const [saving, setSaving] = useState(false)
   const [folders, setFolders] = useState<ScanFolder[]>([])
+  const [appConfig, setAppConfig] = useState<AppConfig | null>(null)
+  const [actualDbPath, setActualDbPath] = useState<string | null>(null)
+  const [restartRequired, setRestartRequired] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -74,6 +80,26 @@ export function SettingsPage() {
       if (result.data) setFolders(result.data as ScanFolder[])
     })()
   }, [])
+
+  useEffect(() => {
+    void invoke<AppConfig>('get_config').then(setAppConfig)
+  }, [])
+
+  useEffect(() => {
+    void api.config.get().then(r => { if (r.data) setActualDbPath(r.data.dbPath) })
+  }, [])
+
+  async function changeDataDir() {
+    const selected = await open({ directory: true, multiple: false, defaultPath: appConfig?.dataDir })
+    if (!selected) return
+    await invoke('set_data_dir', {
+      newDir: selected as string,
+      moveFiles: true,
+      currentDbPath: actualDbPath,
+    })
+    setAppConfig({ dataDir: selected as string, dbPath: `${selected as string}/rmdb.sqlite` })
+    setRestartRequired(true)
+  }
 
   function openModal(source: ApiSource) {
     setModal({ source, apiKeyInput: source.apiKey ?? '' })
@@ -235,6 +261,46 @@ export function SettingsPage() {
           {t('settings.scanFolders.add')}
         </button>
       </div>
+
+      {/* Data directory */}
+      {appConfig && (
+        <div className="mt-8">
+          <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+            {t('settings.dataDir.title')}
+          </h2>
+          <p className="text-xs text-neutral-400 dark:text-neutral-500 mb-3">
+            {t('settings.dataDir.description')}
+          </p>
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-xs text-neutral-600 dark:text-neutral-400 truncate">
+              {appConfig.dataDir}
+            </span>
+            <button
+              onClick={() => void changeDataDir()}
+              className="shrink-0 inline-flex items-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white border border-neutral-200 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-500 px-2.5 py-1.5 rounded-lg transition-colors"
+            >
+              <FolderOpen size={13} />
+              {t('settings.dataDir.change')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Restart notice */}
+      {restartRequired && (
+        <div className="mt-6 flex items-center gap-3 px-4 py-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+          <span className="text-xs text-amber-700 dark:text-amber-300 flex-1">
+            {t('settings.dataDir.restartNotice')}
+          </span>
+          <button
+            onClick={() => void invoke('restart_app')}
+            className="shrink-0 inline-flex items-center gap-1.5 text-xs font-medium text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100 transition-colors"
+          >
+            <RotateCcw size={12} />
+            {t('settings.dataDir.restartNow')}
+          </button>
+        </div>
+      )}
 
       {/* API status */}
       <div className="mt-auto pt-6 border-t border-neutral-200 dark:border-neutral-800">
