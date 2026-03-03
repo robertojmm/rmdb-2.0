@@ -87,8 +87,8 @@ export function MovieModal({ movieId, initialMovie, onClose }: MovieModalProps) 
   }
 
   const posterSrc = isEditing
-    ? (form.posterPath || `${API_URL}/assets/default_cover`)
-    : (movie.posterPath ?? `${API_URL}/assets/default_cover`)
+    ? (form.posterPath || `${API_URL}/assets/default_poster`)
+    : (movie.posterPath ?? `${API_URL}/assets/default_poster`)
 
   return (
     <div

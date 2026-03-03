@@ -97,7 +97,7 @@ export function ApiPanel() {
                   className="flex gap-3 p-3 bg-neutral-50 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700"
                 >
                   <img
-                    src={movie.posterUrl ?? `${API_URL}/assets/default_cover`}
+                    src={movie.posterUrl ?? `${API_URL}/assets/default_poster`}
                     alt={movie.title}
                     className="w-10 h-14 object-cover rounded-lg shrink-0 bg-neutral-200 dark:bg-neutral-700"
                   />

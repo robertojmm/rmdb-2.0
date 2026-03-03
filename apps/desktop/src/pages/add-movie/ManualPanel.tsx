@@ -35,7 +35,7 @@ export function ManualPanel() {
       <div className="shrink-0 w-48 flex flex-col gap-2">
         <div className="w-48 h-72 rounded-xl overflow-hidden bg-neutral-100 dark:bg-neutral-800">
           <img
-            src={form.posterPath || `${API_URL}/assets/default_cover`}
+            src={form.posterPath || `${API_URL}/assets/default_poster`}
             alt=""
             className="w-full h-full object-contain"
           />

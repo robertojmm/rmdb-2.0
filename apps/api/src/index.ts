@@ -11,7 +11,7 @@ const app = new Elysia()
     origin: "*"
   }))
   .get('/health', () => ({ status: 'ok', version }))
-  .get('/assets/default_cover', () => Bun.file(join(import.meta.dir, '../public/default_cover.jpg')))
+  .get('/assets/default_poster', () => Bun.file(join(import.meta.dir, '../public/default_poster.jpg')))
   .use(moviesRouter)
   .use(apiSourcesRouter)
   .use(scanFoldersRouter)

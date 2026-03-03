@@ -50,7 +50,7 @@ export function MovieDraftModal({ draft, onClose, onSaved }: Props) {
     if (result.data) onSaved(draft.externalId)
   }
 
-  const posterSrc = form.posterPath || `${API_URL}/assets/default_cover`
+  const posterSrc = form.posterPath || `${API_URL}/assets/default_poster`
 
   return (
     <div

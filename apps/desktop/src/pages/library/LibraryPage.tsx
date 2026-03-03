@@ -68,7 +68,7 @@ export function LibraryPage() {
               onClick={() => setSelectedMovie(movie)}
             >
               <img
-                src={movie.posterPath ?? `${API_URL}/assets/default_cover`}
+                src={movie.posterPath ?? `${API_URL}/assets/default_poster`}
                 alt={movie.title}
                 className="w-full h-full object-contain transition-transform duration-200 group-hover:scale-105"
               />
