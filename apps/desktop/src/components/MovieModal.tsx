@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { X, Star, Calendar, Film, Pencil, Check } from 'lucide-react'
+import { X, Star, Calendar, Film, Pencil, Check, Trash2 } from 'lucide-react'
 import { api, API_URL } from '../lib/api'
 
 type MovieItem = NonNullable<Awaited<ReturnType<typeof api.movies.get>>['data']>[number]
@@ -20,14 +20,16 @@ interface MovieModalProps {
   movieId: number
   initialMovie: MovieItem
   onClose: () => void
+  onDelete: (id: number) => void
 }
 
 const inputClass =
   'w-full bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-900 dark:text-neutral-100 rounded-lg px-3 py-1.5 border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-1 focus:ring-neutral-400 dark:focus:ring-neutral-500'
 
-export function MovieModal({ movieId, initialMovie, onClose }: MovieModalProps) {
+export function MovieModal({ movieId, initialMovie, onClose, onDelete }: MovieModalProps) {
   const [movie, setMovie] = useState<MovieDetail>(initialMovie)
   const [isEditing, setIsEditing] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const [form, setForm] = useState<MovieForm>({
     title: '',
     originalTitle: '',
@@ -42,13 +44,14 @@ export function MovieModal({ movieId, initialMovie, onClose }: MovieModalProps) 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (isEditing) setIsEditing(false)
+        if (confirmDelete) setConfirmDelete(false)
+        else if (isEditing) setIsEditing(false)
         else onClose()
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [onClose, isEditing])
+  }, [onClose, isEditing, confirmDelete])
 
   useEffect(() => {
     void (async () => {
@@ -84,6 +87,11 @@ export function MovieModal({ movieId, initialMovie, onClose }: MovieModalProps) 
     })
     if (result.data) setMovie(result.data)
     setIsEditing(false)
+  }
+
+  async function deleteMovie() {
+    await api.movies[String(movieId)].delete()
+    onDelete(movieId)
   }
 
   const posterSrc = isEditing
@@ -136,7 +144,7 @@ export function MovieModal({ movieId, initialMovie, onClose }: MovieModalProps) 
 
         {/* View mode */}
         {!isEditing && (
-          <div className="flex flex-col gap-4 min-w-0 pr-6 py-2">
+          <div className="flex flex-col gap-4 min-w-0 pr-6 py-2 flex-1">
             <div>
               <h2 className="text-2xl font-bold leading-tight">{movie.title}</h2>
               {movie.originalTitle && movie.originalTitle !== movie.title && (
@@ -165,12 +173,39 @@ export function MovieModal({ movieId, initialMovie, onClose }: MovieModalProps) 
               </p>
             )}
 
-            {movie.filePath && (
-              <p className="flex items-center gap-1.5 text-xs text-neutral-400 mt-auto truncate">
-                <Film size={12} className="shrink-0" />
-                {movie.filePath}
-              </p>
-            )}
+            <div className="flex items-center justify-between mt-auto pt-2">
+              {movie.filePath ? (
+                <p className="flex items-center gap-1.5 text-xs text-neutral-400 truncate min-w-0">
+                  <Film size={12} className="shrink-0" />
+                  {movie.filePath}
+                </p>
+              ) : <span />}
+
+              {confirmDelete ? (
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-xs text-neutral-500">Borrar definitivamente?</span>
+                  <button
+                    onClick={() => void deleteMovie()}
+                    className="text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
+                  >
+                    Sí, borrar
+                  </button>
+                  <button
+                    onClick={() => setConfirmDelete(false)}
+                    className="text-xs text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setConfirmDelete(true)}
+                  className="shrink-0 text-neutral-300 dark:text-neutral-600 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
+            </div>
           </div>
         )}
 

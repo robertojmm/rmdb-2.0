@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Check } from 'lucide-react'
-import { API_URL } from '../../lib/api'
+import { API_URL, api } from '../../lib/api'
 
 type Form = {
   title: string
@@ -24,10 +24,39 @@ const inputClass =
 export function ManualPanel() {
   const { t } = useTranslation()
   const [form, setForm] = useState<Form>(empty)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [saved, setSaved] = useState(false)
 
   const set = (k: keyof Form) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setForm(f => ({ ...f, [k]: e.target.value }))
+
+  async function submit() {
+    if (!form.title.trim()) return
+    setSaving(true)
+    setError(null)
+    setSaved(false)
+
+    const result = await api.movies.post({
+      title: form.title.trim(),
+      originalTitle: form.originalTitle.trim() || undefined,
+      year: form.year ? parseInt(form.year) : undefined,
+      overview: form.overview.trim() || undefined,
+      rating: form.rating ? parseFloat(form.rating) : undefined,
+      posterPath: form.posterPath.trim() || undefined,
+      filePath: form.filePath.trim() || undefined,
+    })
+
+    setSaving(false)
+    if (result.error) {
+      setError(String(result.error.value))
+    } else {
+      setForm(empty)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    }
+  }
 
   return (
     <div className="flex gap-8 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-8">
@@ -94,20 +123,29 @@ export function ManualPanel() {
           value={form.filePath}
           onChange={set('filePath')}
         />
-        <div className="flex gap-2 mt-auto pt-2">
+        <div className="flex items-center gap-3 mt-auto pt-2">
           <button
-            onClick={() => { /* TODO: POST to API */ }}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:opacity-80 transition-opacity"
+            onClick={() => void submit()}
+            disabled={saving || !form.title.trim()}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Check size={14} />
-            {t('addMovie.manual.addToLibrary')}
+            {saving ? '...' : t('addMovie.manual.addToLibrary')}
           </button>
           <button
-            onClick={() => setForm(empty)}
+            onClick={() => { setForm(empty); setError(null); setSaved(false) }}
             className="px-4 py-2 text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
           >
             {t('addMovie.manual.clear')}
           </button>
+          {saved && (
+            <span className="text-xs text-green-600 dark:text-green-400">
+              {t('addMovie.manual.addToLibrary')} ✓
+            </span>
+          )}
+          {error && (
+            <span className="text-xs text-red-500 truncate">{error}</span>
+          )}
         </div>
       </div>
     </div>

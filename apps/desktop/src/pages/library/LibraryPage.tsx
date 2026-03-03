@@ -83,6 +83,10 @@ export function LibraryPage() {
           movieId={selectedMovie.id}
           initialMovie={selectedMovie}
           onClose={() => setSelectedMovie(null)}
+          onDelete={(id) => {
+            setMovies(ms => ms.filter(m => m.id !== id))
+            setSelectedMovie(null)
+          }}
         />
       )}
     </div>
