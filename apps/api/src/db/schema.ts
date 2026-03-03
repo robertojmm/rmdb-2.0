@@ -8,6 +8,14 @@ export const apiSources = sqliteTable('api_sources', {
   configuration: text('configuration'),
 })
 
+export const scanFolders = sqliteTable('scan_folders', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  path: text('path').notNull().unique(),
+  addedAt: integer('added_at', { mode: 'timestamp' })
+    .notNull()
+    .$defaultFn(() => new Date()),
+})
+
 export const movies = sqliteTable('movies', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   title: text('title').notNull(),

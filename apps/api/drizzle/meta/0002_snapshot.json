@@ -1,0 +1,68 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "d4e5f6a7-b8c9-4d0e-a1b2-c3d4e5f60007",
+  "prevId": "c2c313ca-2b25-52e5-b38f-f3261f5d3756",
+  "tables": {
+    "api_sources": {
+      "name": "api_sources",
+      "columns": {
+        "id": { "name": "id", "type": "integer", "primaryKey": true, "notNull": true, "autoincrement": true },
+        "name": { "name": "name", "type": "text", "primaryKey": false, "notNull": true, "autoincrement": false },
+        "url": { "name": "url", "type": "text", "primaryKey": false, "notNull": true, "autoincrement": false },
+        "needs_configuration": { "name": "needs_configuration", "type": "integer", "primaryKey": false, "notNull": true, "autoincrement": false, "default": false },
+        "configuration": { "name": "configuration", "type": "text", "primaryKey": false, "notNull": false, "autoincrement": false }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "scan_folders": {
+      "name": "scan_folders",
+      "columns": {
+        "id": { "name": "id", "type": "integer", "primaryKey": true, "notNull": true, "autoincrement": true },
+        "path": { "name": "path", "type": "text", "primaryKey": false, "notNull": true, "autoincrement": false },
+        "added_at": { "name": "added_at", "type": "integer", "primaryKey": false, "notNull": true, "autoincrement": false }
+      },
+      "indexes": {
+        "scan_folders_path_unique": {
+          "name": "scan_folders_path_unique",
+          "columns": ["path"],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "movies": {
+      "name": "movies",
+      "columns": {
+        "id": { "name": "id", "type": "integer", "primaryKey": true, "notNull": true, "autoincrement": true },
+        "title": { "name": "title", "type": "text", "primaryKey": false, "notNull": true, "autoincrement": false },
+        "original_title": { "name": "original_title", "type": "text", "primaryKey": false, "notNull": false, "autoincrement": false },
+        "year": { "name": "year", "type": "integer", "primaryKey": false, "notNull": false, "autoincrement": false },
+        "overview": { "name": "overview", "type": "text", "primaryKey": false, "notNull": false, "autoincrement": false },
+        "tmdb_id": { "name": "tmdb_id", "type": "integer", "primaryKey": false, "notNull": false, "autoincrement": false },
+        "rating": { "name": "rating", "type": "real", "primaryKey": false, "notNull": false, "autoincrement": false },
+        "poster_path": { "name": "poster_path", "type": "text", "primaryKey": false, "notNull": false, "autoincrement": false },
+        "file_path": { "name": "file_path", "type": "text", "primaryKey": false, "notNull": false, "autoincrement": false },
+        "added_at": { "name": "added_at", "type": "integer", "primaryKey": false, "notNull": true, "autoincrement": false }
+      },
+      "indexes": {
+        "movies_tmdb_id_unique": { "name": "movies_tmdb_id_unique", "columns": ["tmdb_id"], "isUnique": true }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": { "schemas": {}, "tables": {}, "columns": {} },
+  "internal": { "indexes": {} }
+}
