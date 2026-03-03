@@ -7,7 +7,9 @@
       "@db": ["src/db/index.ts"],
       "@db/*": ["src/db/*"],
       "@movies": ["src/movies/index.ts"],
-      "@movies/*": ["src/movies/*"]
+      "@movies/*": ["src/movies/*"],
+      "@api-sources": ["src/api-sources/index.ts"],
+      "@api-sources/*": ["src/api-sources/*"]
     }
   },
   "include": ["src/**/*", "drizzle.config.ts"]
