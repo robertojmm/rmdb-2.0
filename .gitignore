@@ -16,8 +16,6 @@ dist-ssr/
 *.sqlite3
 apps/api/data/
 
-# Drizzle generated migrations
-drizzle/
 
 # Rust / Tauri build artifacts (can be several GB)
 apps/desktop/src-tauri/target/
@@ -42,3 +40,6 @@ Thumbs.db
 .idea/
 *.suo
 *.sw?
+
+
+TODO.md

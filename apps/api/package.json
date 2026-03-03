@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "author": "",
   "dependencies": {
+    "@elysiajs/cors": "^1.4.1",
     "drizzle-orm": "^0.44.2",
     "elysia": "latest"
   },

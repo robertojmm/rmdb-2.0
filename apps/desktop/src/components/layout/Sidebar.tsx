@@ -12,9 +12,9 @@ export function Sidebar() {
   const { t } = useTranslation()
 
   return (
-    <aside className="w-56 h-screen bg-neutral-900 flex flex-col shrink-0 border-r border-neutral-800">
+    <aside className="w-56 h-screen bg-white dark:bg-neutral-900 flex flex-col shrink-0 border-r border-neutral-200 dark:border-neutral-800">
       <div className="px-4 py-5">
-        <span className="text-white font-bold text-lg tracking-wide">RMDB</span>
+        <span className="text-neutral-900 dark:text-white font-bold text-lg tracking-wide">RMDB</span>
       </div>
 
       <nav className="flex-1 px-2 pb-4 flex flex-col gap-1">
@@ -26,8 +26,8 @@ export function Sidebar() {
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                 isActive
-                  ? 'bg-white/10 text-white'
-                  : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-neutral-900/10 text-neutral-900 dark:bg-white/10 dark:text-white'
+                  : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-900/5 dark:text-neutral-400 dark:hover:text-white dark:hover:bg-white/5'
               }`
             }
           >

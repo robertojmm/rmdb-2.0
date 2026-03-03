@@ -20,4 +20,20 @@ export const moviesRouter = new Elysia({ prefix: '/movies' })
       }),
     },
   )
+  .patch(
+    '/:id',
+    ({ params, body }) => moviesService.update(Number(params.id), body),
+    {
+      body: t.Object({
+        title: t.Optional(t.String()),
+        originalTitle: t.Optional(t.String()),
+        year: t.Optional(t.Integer()),
+        overview: t.Optional(t.String()),
+        tmdbId: t.Optional(t.Integer()),
+        rating: t.Optional(t.Number()),
+        posterPath: t.Optional(t.String()),
+        filePath: t.Optional(t.String()),
+      }),
+    },
+  )
   .delete('/:id', ({ params }) => moviesService.delete(Number(params.id)))

@@ -3,12 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "workspaces": ["apps/*", "libs/*"],
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
   "scripts": {
     "api:dev": "bun run --cwd apps/api dev",
     "api:build": "bun run --cwd apps/api build",
     "api:push": "bun run --cwd apps/api push",
     "desktop:dev": "bun run --cwd apps/desktop tauri dev",
+    "desktop:web": "bun run --cwd apps/desktop dev",
     "desktop:build": "bun run --cwd apps/desktop tauri build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"

@@ -6,7 +6,9 @@
   },
   "library": {
     "title": "Mi biblioteca",
-    "empty": "Sin películas aún. ¡Añade la primera!"
+    "empty": "Sin películas aún. ¡Añade la primera!",
+    "loading": "Cargando...",
+    "error": "No se pudo conectar con la API."
   },
   "addMovie": {
     "title": "Añadir película"
@@ -17,6 +19,18 @@
     "languages": {
       "en": "Inglés",
       "es": "Español"
+    },
+    "theme": "Tema",
+    "themes": {
+      "system": "Sistema",
+      "light": "Claro",
+      "dark": "Oscuro"
+    },
+    "apiStatus": {
+      "label": "API",
+      "checking": "Comprobando...",
+      "online": "En línea",
+      "offline": "Sin conexión"
     }
   }
 }

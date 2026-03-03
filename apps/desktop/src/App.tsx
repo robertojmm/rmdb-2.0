@@ -1,4 +1,5 @@
 import { HashRouter, Route, Routes } from 'react-router-dom'
+import { ThemeProvider } from './context/ThemeContext'
 import { Layout } from './components/layout/Layout'
 import { AddMoviePage } from './pages/add-movie/AddMoviePage'
 import { LibraryPage } from './pages/library/LibraryPage'
@@ -7,15 +8,17 @@ import './App.css'
 
 function App() {
   return (
-    <HashRouter>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index element={<LibraryPage />} />
-          <Route path="add-movie" element={<AddMoviePage />} />
-          <Route path="settings" element={<SettingsPage />} />
-        </Route>
-      </Routes>
-    </HashRouter>
+    <ThemeProvider>
+      <HashRouter>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route index element={<LibraryPage />} />
+            <Route path="add-movie" element={<AddMoviePage />} />
+            <Route path="settings" element={<SettingsPage />} />
+          </Route>
+        </Routes>
+      </HashRouter>
+    </ThemeProvider>
   )
 }
 

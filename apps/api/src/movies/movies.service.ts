@@ -3,6 +3,7 @@ import { db } from '@db'
 import { movies } from '@db/schema'
 
 type NewMovie = Omit<typeof movies.$inferInsert, 'id' | 'addedAt'>
+type MovieUpdate = Partial<NewMovie>
 
 export const moviesService = {
   findAll: () => db.select().from(movies),
@@ -20,6 +21,14 @@ export const moviesService = {
       .values(data)
       .returning()
       .then((r) => r[0]),
+
+  update: (id: number, data: MovieUpdate) =>
+    db
+      .update(movies)
+      .set(data)
+      .where(eq(movies.id, id))
+      .returning()
+      .then((r) => r[0] ?? null),
 
   delete: (id: number) => db.delete(movies).where(eq(movies.id, id)),
 }

@@ -6,7 +6,9 @@
   },
   "library": {
     "title": "My Library",
-    "empty": "No movies yet. Add your first one!"
+    "empty": "No movies yet. Add your first one!",
+    "loading": "Loading...",
+    "error": "Could not connect to the API."
   },
   "addMovie": {
     "title": "Add Movie"
@@ -17,6 +19,18 @@
     "languages": {
       "en": "English",
       "es": "Spanish"
+    },
+    "theme": "Theme",
+    "themes": {
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "apiStatus": {
+      "label": "API",
+      "checking": "Checking...",
+      "online": "Online",
+      "offline": "Offline"
     }
   }
 }
