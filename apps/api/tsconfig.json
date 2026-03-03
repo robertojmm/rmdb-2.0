@@ -9,7 +9,9 @@
       "@movies": ["src/movies/index.ts"],
       "@movies/*": ["src/movies/*"],
       "@api-sources": ["src/api-sources/index.ts"],
-      "@api-sources/*": ["src/api-sources/*"]
+      "@api-sources/*": ["src/api-sources/*"],
+      "@scan-folders": ["src/scan-folders/index.ts"],
+      "@scan-folders/*": ["src/scan-folders/*"]
     }
   },
   "include": ["src/**/*", "drizzle.config.ts"]
