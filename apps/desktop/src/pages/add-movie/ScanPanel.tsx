@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Folder, Play, CheckCircle2, SkipForward, Plus, Pencil, Trash2 } from 'lucide-react'
+import { Folder, Play, CheckCircle2, SkipForward, Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { getLastApiSource, saveLastApiSource } from '../../lib/preferences'
 import { ApiSourceSelect, type ApiSource } from './ApiSourceSelect'
 import { MovieDraftModal } from './MovieDraftModal'
@@ -58,6 +58,10 @@ export function ScanPanel() {
   const [addingIndex, setAddingIndex] = useState(0)
   const [addedCount, setAddedCount] = useState(0)
 
+  // Pagination for the choosing screen
+  const [identifiedPage, setIdentifiedPage] = useState(0)
+  const [unidentifiedPage, setUnidentifiedPage] = useState(0)
+
   // Unidentified item being edited in MovieDraftModal
   const [editingItem, setEditingItem] = useState<UnidentifiedResult | null>(null)
 
@@ -85,6 +89,8 @@ export function ScanPanel() {
     setAddedCount(0)
     setReviewIndex(0)
     setAddingIndex(0)
+    setIdentifiedPage(0)
+    setUnidentifiedPage(0)
 
     const es = new EventSource(`${API_URL}/scan/stream?sourceId=${source.id}`)
     esRef.current = es
@@ -220,12 +226,21 @@ export function ScanPanel() {
     setReviewIndex(0)
     setAddedCount(0)
     setAddingIndex(0)
+    setIdentifiedPage(0)
+    setUnidentifiedPage(0)
   }
 
   // ── Derived ────────────────────────────────────────────────────────────────
 
+  const ITEMS_PER_PAGE = 5
+
   const pct = scanTotal > 0 ? Math.round((scanCurrent / scanTotal) * 100) : 0
   const currentReviewItem = identified[reviewIndex]
+
+  const identifiedPageCount = Math.ceil(identified.length / ITEMS_PER_PAGE)
+  const identifiedPageItems = identified.slice(identifiedPage * ITEMS_PER_PAGE, (identifiedPage + 1) * ITEMS_PER_PAGE)
+  const unidentifiedPageCount = Math.ceil(unidentified.length / ITEMS_PER_PAGE)
+  const unidentifiedPageItems = unidentified.slice(unidentifiedPage * ITEMS_PER_PAGE, (unidentifiedPage + 1) * ITEMS_PER_PAGE)
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -309,12 +324,12 @@ export function ScanPanel() {
 
           {/* Identified list */}
           {identified.length > 0 && (
-            <div className="flex-1 flex flex-col min-h-0">
-              <p className="shrink-0 text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-2">
+            <div className="flex flex-col gap-2">
+              <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
                 {t('addMovie.search.identified', { count: identified.length })}
               </p>
-              <ul className="flex-1 overflow-y-auto flex flex-col gap-1.5 pr-1">
-                {identified.map(item => (
+              <ul className="flex flex-col gap-1.5">
+                {identifiedPageItems.map(item => (
                   <li key={item.filePath} className="flex items-center gap-3 px-3 py-2 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
                     <div className="shrink-0 w-8 h-11 rounded overflow-hidden bg-neutral-200 dark:bg-neutral-700">
                       <img
@@ -335,17 +350,18 @@ export function ScanPanel() {
                   </li>
                 ))}
               </ul>
+              <PaginationBar page={identifiedPage} total={identifiedPageCount} onChange={setIdentifiedPage} />
             </div>
           )}
 
           {/* Unidentified list */}
           {unidentified.length > 0 && (
-            <div className="flex-1 flex flex-col min-h-0">
-              <p className="shrink-0 text-xs font-medium text-amber-600 dark:text-amber-400 mb-2">
+            <div className="flex flex-col gap-2">
+              <p className="text-xs font-medium text-amber-600 dark:text-amber-400">
                 {t('addMovie.search.notIdentified', { count: unidentified.length })}
               </p>
-              <ul className="flex-1 overflow-y-auto flex flex-col gap-1.5 pr-1">
-                {unidentified.map(item => (
+              <ul className="flex flex-col gap-1.5">
+                {unidentifiedPageItems.map(item => (
                   <li key={item.filePath} className="px-3 py-2 bg-amber-50 dark:bg-amber-950/20 rounded-lg">
                     <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 truncate">
                       {item.parsedTitle}
@@ -357,6 +373,7 @@ export function ScanPanel() {
                   </li>
                 ))}
               </ul>
+              <PaginationBar page={unidentifiedPage} total={unidentifiedPageCount} onChange={setUnidentifiedPage} />
             </div>
           )}
 
@@ -367,7 +384,7 @@ export function ScanPanel() {
 
           {/* Action buttons */}
           {identified.length > 0 && (
-            <div className="shrink-0 flex gap-3">
+            <div className="shrink-0 flex gap-3 mt-auto">
               <button
                 onClick={() => void autoAdd()}
                 className="flex items-center gap-1.5 px-4 py-2 text-sm bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:opacity-80 transition-opacity"
@@ -389,7 +406,7 @@ export function ScanPanel() {
           {identified.length === 0 && unidentified.length > 0 && (
             <button
               onClick={() => setStatus('unidentified')}
-              className="self-start text-sm text-neutral-500 underline hover:text-neutral-700 dark:hover:text-neutral-300"
+              className="self-start text-sm text-neutral-500 underline hover:text-neutral-700 dark:hover:text-neutral-300 mt-auto"
             >
               {t('addMovie.search.reviewUnidentified')}
             </button>
@@ -543,6 +560,33 @@ export function ScanPanel() {
           onSaved={onUnidentifiedSaved}
         />
       )}
+    </div>
+  )
+}
+
+// ─── PaginationBar ────────────────────────────────────────────────────────────
+
+function PaginationBar({ page, total, onChange }: {
+  page: number; total: number; onChange: (p: number) => void
+}) {
+  if (total <= 1) return null
+  return (
+    <div className="flex items-center gap-1">
+      <button
+        onClick={() => onChange(page - 1)}
+        disabled={page === 0}
+        className="p-1 rounded text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+      >
+        <ChevronLeft size={14} />
+      </button>
+      <span className="text-xs text-neutral-400 tabular-nums">{page + 1} / {total}</span>
+      <button
+        onClick={() => onChange(page + 1)}
+        disabled={page === total - 1}
+        className="p-1 rounded text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+      >
+        <ChevronRight size={14} />
+      </button>
     </div>
   )
 }
