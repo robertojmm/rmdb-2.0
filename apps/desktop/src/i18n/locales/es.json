@@ -73,6 +73,12 @@
         "cancel": "Cancelar"
       }
     },
+    "scanFolders": {
+      "title": "Carpetas de escaneo",
+      "empty": "No hay carpetas configuradas.",
+      "add": "Añadir carpeta",
+      "remove": "Eliminar"
+    },
     "apiStatus": {
       "label": "API",
       "checking": "Comprobando...",

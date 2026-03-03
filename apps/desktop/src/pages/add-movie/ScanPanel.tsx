@@ -1,21 +1,17 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Folder, Play, CheckCircle2 } from 'lucide-react'
 import { getLastApiSource, saveLastApiSource } from '../../lib/preferences'
 import { ApiSourceSelect, type ApiSource } from './ApiSourceSelect'
-
-// Placeholder — will come from Settings in the future
-const MOCK_FOLDERS = [
-  'C:\\Users\\User\\Videos\\Movies',
-  'D:\\Media\\Films',
-]
+import { api } from '../../lib/api'
 
 type ScanStatus = 'idle' | 'scanning' | 'matching' | 'done'
+type ScanFolder = { id: number; path: string }
 
 export function ScanPanel() {
   const { t } = useTranslation()
   const [source, setSource] = useState<ApiSource | null>(getLastApiSource)
-
+  const [folders, setFolders] = useState<ScanFolder[]>([])
   const [status, setStatus] = useState<ScanStatus>('idle')
   const [scanProgress, setScanProgress] = useState(0)
   const [matchProgress, setMatchProgress] = useState(0)
@@ -23,6 +19,13 @@ export function ScanPanel() {
   void setScanProgress
   void setMatchProgress
   void setStatus
+
+  useEffect(() => {
+    void (async () => {
+      const result = await api['scan-folders'].get()
+      if (result.data) setFolders(result.data as ScanFolder[])
+    })()
+  }, [])
 
   const steps = [
     {
@@ -58,19 +61,19 @@ export function ScanPanel() {
         <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-2">
           {t('addMovie.search.foldersLabel')}
         </p>
-        {MOCK_FOLDERS.length === 0 ? (
+        {folders.length === 0 ? (
           <p className="text-sm text-neutral-400 dark:text-neutral-500">
             {t('addMovie.search.noFolders')}
           </p>
         ) : (
           <ul className="flex flex-col gap-1.5">
-            {MOCK_FOLDERS.map(folder => (
+            {folders.map(folder => (
               <li
-                key={folder}
+                key={folder.id}
                 className="flex items-center gap-2 px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-800 rounded-lg"
               >
                 <Folder size={14} className="shrink-0 text-neutral-400" />
-                {folder}
+                {folder.path}
               </li>
             ))}
           </ul>
@@ -79,7 +82,7 @@ export function ScanPanel() {
 
       {/* Start scan */}
       <button
-        disabled={!source || MOCK_FOLDERS.length === 0 || status !== 'idle'}
+        disabled={!source || folders.length === 0 || status !== 'idle'}
         onClick={() => { /* TODO: trigger scan via Tauri command */ }}
         className="self-start flex items-center gap-1.5 px-4 py-2 text-sm bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
       >

@@ -73,6 +73,12 @@
         "cancel": "Cancel"
       }
     },
+    "scanFolders": {
+      "title": "Scan Folders",
+      "empty": "No folders configured.",
+      "add": "Add folder",
+      "remove": "Remove"
+    },
     "apiStatus": {
       "label": "API",
       "checking": "Checking...",

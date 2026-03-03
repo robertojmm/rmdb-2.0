@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Settings2, X, Check } from 'lucide-react'
+import { Settings2, X, Check, FolderPlus, Trash2 } from 'lucide-react'
+import { open } from '@tauri-apps/plugin-dialog'
 import { type Theme, useTheme } from '../../context/ThemeContext'
 import { api } from '../../lib/api'
 
@@ -31,6 +32,11 @@ type ApiSource = {
   apiKey: string | null
 }
 
+type ScanFolder = {
+  id: number
+  path: string
+}
+
 type ConfiguringModal = { source: ApiSource; apiKeyInput: string }
 
 export function SettingsPage() {
@@ -41,6 +47,7 @@ export function SettingsPage() {
   const [sources, setSources] = useState<ApiSource[]>([])
   const [modal, setModal] = useState<ConfiguringModal | null>(null)
   const [saving, setSaving] = useState(false)
+  const [folders, setFolders] = useState<ScanFolder[]>([])
 
   useEffect(() => {
     let cancelled = false
@@ -61,6 +68,13 @@ export function SettingsPage() {
     })()
   }, [])
 
+  useEffect(() => {
+    void (async () => {
+      const result = await api['scan-folders'].get()
+      if (result.data) setFolders(result.data as ScanFolder[])
+    })()
+  }, [])
+
   function openModal(source: ApiSource) {
     setModal({ source, apiKeyInput: source.apiKey ?? '' })
   }
@@ -74,6 +88,18 @@ export function SettingsPage() {
     }
     setSaving(false)
     setModal(null)
+  }
+
+  async function addFolder() {
+    const selected = await open({ directory: true, multiple: false })
+    if (!selected) return
+    const result = await api['scan-folders'].post({ path: selected as string })
+    if (result.data) setFolders(f => [...f, result.data as ScanFolder])
+  }
+
+  async function removeFolder(id: number) {
+    await api['scan-folders'][String(id)].delete()
+    setFolders(f => f.filter(folder => folder.id !== id))
   }
 
   return (
@@ -168,6 +194,46 @@ export function SettingsPage() {
             })}
           </tbody>
         </table>
+      </div>
+
+      {/* Scan folders */}
+      <div className="mt-8">
+        <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">
+          {t('settings.scanFolders.title')}
+        </h2>
+        {folders.length === 0 ? (
+          <p className="text-sm text-neutral-400 dark:text-neutral-500 mb-3">
+            {t('settings.scanFolders.empty')}
+          </p>
+        ) : (
+          <table className="w-full text-sm mb-3">
+            <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+              {folders.map(folder => (
+                <tr key={folder.id}>
+                  <td className="py-2.5 pr-4 text-neutral-700 dark:text-neutral-300 font-mono text-xs truncate max-w-0 w-full">
+                    {folder.path}
+                  </td>
+                  <td className="py-2.5 text-right shrink-0">
+                    <button
+                      onClick={() => void removeFolder(folder.id)}
+                      className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                    >
+                      <Trash2 size={13} />
+                      {t('settings.scanFolders.remove')}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        <button
+          onClick={() => void addFolder()}
+          className="inline-flex items-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white border border-neutral-200 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-500 px-2.5 py-1.5 rounded-lg transition-colors"
+        >
+          <FolderPlus size={13} />
+          {t('settings.scanFolders.add')}
+        </button>
       </div>
 
       {/* API status */}
