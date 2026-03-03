@@ -42,7 +42,23 @@
       "startScan": "Iniciar escaneo",
       "step1": "Buscando ficheros de película",
       "step2": "Identificando películas con la API",
-      "done": "Completado"
+      "done": "Completado",
+      "scanComplete": "Escaneo completado",
+      "identified": "{{count}} películas identificadas",
+      "notIdentified": "{{count}} sin identificar",
+      "noFiles": "No se encontraron películas en las carpetas configuradas.",
+      "autoAdd": "Añadir todas ({{count}})",
+      "reviewOne": "Revisar una a una",
+      "reviewUnidentified": "Revisar ficheros sin identificar",
+      "reviewing": "Revisando {{current}} de {{total}}",
+      "skip": "Saltar",
+      "autoAdding": "Añadiendo {{current}} de {{total}}...",
+      "unidentifiedTitle": "Ficheros sin identificar",
+      "unidentifiedDesc": "Estos ficheros no pudieron identificarse automáticamente. Edítalos manualmente o descártalos.",
+      "editManually": "Editar",
+      "complete": "¡Todo listo!",
+      "addedCount": "{{count}} películas añadidas a tu biblioteca.",
+      "newScan": "Nuevo escaneo"
     }
   },
   "settings": {

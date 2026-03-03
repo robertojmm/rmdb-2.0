@@ -9,11 +9,12 @@ const inputClass =
 
 interface Props {
   draft: SearchResult
+  initialFilePath?: string
   onClose: () => void
   onSaved: (externalId: string) => void
 }
 
-export function MovieDraftModal({ draft, onClose, onSaved }: Props) {
+export function MovieDraftModal({ draft, initialFilePath, onClose, onSaved }: Props) {
   const { t } = useTranslation()
   const [form, setForm] = useState({
     title: draft.title,
@@ -23,7 +24,7 @@ export function MovieDraftModal({ draft, onClose, onSaved }: Props) {
     rating: draft.rating?.toString() ?? '',
     tmdbId: draft.tmdbId?.toString() ?? '',
     posterPath: draft.posterUrl ?? '',
-    filePath: '',
+    filePath: initialFilePath ?? '',
   })
   const [saving, setSaving] = useState(false)
 

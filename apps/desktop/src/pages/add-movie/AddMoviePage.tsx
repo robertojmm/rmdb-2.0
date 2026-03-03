@@ -18,7 +18,7 @@ export function AddMoviePage() {
   const [selected, setSelected] = useState<AddMethod | null>(null)
 
   return (
-    <div>
+    <div className="h-full flex flex-col">
       <h1 className="text-2xl font-bold mb-2">{t('addMovie.title')}</h1>
       <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-8">
         {t('addMovie.subtitle')}
@@ -79,7 +79,7 @@ export function AddMoviePage() {
       </div>
 
       {selected && (
-        <div className="mt-6">
+        <div className={`mt-6${selected === 'search' ? ' flex-1 flex flex-col min-h-0' : ''}`}>
           {selected === 'manual' && <ManualPanel />}
           {selected === 'api'    && <ApiPanel />}
           {selected === 'search' && <ScanPanel />}

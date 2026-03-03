@@ -42,7 +42,23 @@
       "startScan": "Start scan",
       "step1": "Scanning for movie files",
       "step2": "Matching movies with API",
-      "done": "Done"
+      "done": "Done",
+      "scanComplete": "Scan complete",
+      "identified": "{{count}} movies identified",
+      "notIdentified": "{{count}} not identified",
+      "noFiles": "No movies found in your configured folders.",
+      "autoAdd": "Add all ({{count}})",
+      "reviewOne": "Review one by one",
+      "reviewUnidentified": "Review unidentified files",
+      "reviewing": "Reviewing {{current}} of {{total}}",
+      "skip": "Skip",
+      "autoAdding": "Adding {{current}} of {{total}}...",
+      "unidentifiedTitle": "Unidentified files",
+      "unidentifiedDesc": "These files couldn't be matched automatically. Edit them manually or discard.",
+      "editManually": "Edit",
+      "complete": "All done!",
+      "addedCount": "{{count}} movies added to your library.",
+      "newScan": "New scan"
     }
   },
   "settings": {
