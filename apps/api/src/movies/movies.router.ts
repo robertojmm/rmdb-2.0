@@ -1,12 +1,22 @@
 import { Elysia, t } from 'elysia'
 import { moviesService } from './movies.service'
+import { downloadPoster, deletePoster } from './poster.service'
 
 export const moviesRouter = new Elysia({ prefix: '/movies' })
   .get('/', () => moviesService.findAll())
   .get('/:id', ({ params }) => moviesService.findById(Number(params.id)))
   .post(
     '/',
-    ({ body }) => moviesService.create(body),
+    async ({ body }) => {
+      const { posterPath: externalUrl, ...rest } = body
+      const movie = await moviesService.create({ ...rest, posterPath: externalUrl })
+      if (!movie) return null
+      if (externalUrl) {
+        const localPath = await downloadPoster(movie.id, externalUrl)
+        if (localPath) return moviesService.update(movie.id, { posterPath: localPath })
+      }
+      return movie
+    },
     {
       body: t.Object({
         title: t.String(),
@@ -36,4 +46,8 @@ export const moviesRouter = new Elysia({ prefix: '/movies' })
       }),
     },
   )
-  .delete('/:id', ({ params }) => moviesService.delete(Number(params.id)))
+  .delete('/:id', ({ params }) => {
+    const id = Number(params.id)
+    deletePoster(id)
+    return moviesService.delete(id)
+  })

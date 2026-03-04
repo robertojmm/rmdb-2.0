@@ -6,6 +6,7 @@ import { apiSourcesRouter } from '@api-sources/api-sources.router'
 import { scanFoldersRouter } from '@scan-folders/scan-folders.router'
 import { scanRouter } from './scan/scan.router'
 import { movieDraftsRouter } from './movie-drafts/movie-drafts.router'
+import { postersDir } from '@movies/poster.service'
 import { version } from '../package.json'
 import { config } from './config'
 
@@ -16,6 +17,10 @@ const app = new Elysia()
   .get('/health', () => ({ status: 'ok', version }))
   .get('/config', () => ({ dbPath: config.dbPath }))
   .get('/assets/default_poster', () => Bun.file(join(import.meta.dir, '../public/default_poster.jpg')))
+  .get('/assets/posters/:filename', async ({ params }) => {
+    const file = Bun.file(join(postersDir, params.filename))
+    return await file.exists() ? file : new Response(null, { status: 404 })
+  })
   .use(moviesRouter)
   .use(apiSourcesRouter)
   .use(scanFoldersRouter)

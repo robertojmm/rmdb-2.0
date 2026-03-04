@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { api, API_URL } from '../../lib/api'
+import { api, resolvePosterUrl } from '../../lib/api'
 import { MovieModal } from '../../components/MovieModal'
 
 type Movie = Awaited<ReturnType<typeof api.movies.get>>['data']
@@ -66,12 +66,14 @@ export function LibraryPage() {
             <div
               key={movie.id}
               className="group aspect-[2/3] w-full relative overflow-hidden rounded-lg cursor-pointer"
+              style={{ contentVisibility: 'auto', containIntrinsicSize: '0 300px' }}
               onClick={() => setSelectedMovie(movie)}
             >
               <img
-                src={movie.posterPath ?? `${API_URL}/assets/default_poster`}
+                src={resolvePosterUrl(movie.posterPath)}
                 alt={movie.title}
                 loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 rounded-lg" />

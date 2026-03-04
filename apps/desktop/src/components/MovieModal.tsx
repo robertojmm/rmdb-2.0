@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { X, Star, Calendar, Film, Pencil, Check, Trash2 } from 'lucide-react'
-import { api, API_URL } from '../lib/api'
+import { api, resolvePosterUrl } from '../lib/api'
 
 type MovieItem = NonNullable<Awaited<ReturnType<typeof api.movies.get>>['data']>[number]
 type MovieDetail = NonNullable<Awaited<ReturnType<typeof api.movies[string]['get']>>['data']>
@@ -95,8 +95,8 @@ export function MovieModal({ movieId, initialMovie, onClose, onDelete }: MovieMo
   }
 
   const posterSrc = isEditing
-    ? (form.posterPath || `${API_URL}/assets/default_poster`)
-    : (movie.posterPath ?? `${API_URL}/assets/default_poster`)
+    ? resolvePosterUrl(form.posterPath || null)
+    : resolvePosterUrl(movie.posterPath)
 
   return (
     <div
