@@ -4,6 +4,8 @@ import { extname, join, basename } from 'node:path'
 import { scanFoldersService } from '../scan-folders/scan-folders.service'
 import { apiSourcesService } from '../api-sources/api-sources.service'
 import { parseFilename } from './filename-parser'
+import { db } from '@db'
+import { movies } from '@db/schema'
 
 const VIDEO_EXTS = new Set([
   '.mkv', '.mp4', '.avi', '.mov', '.wmv', '.m4v', '.flv', '.ts', '.webm', '.divx', '.mpg', '.mpeg',
@@ -42,10 +44,18 @@ export const scanRouter = new Elysia({ prefix: '/scan' })
           try {
             // Step 1: collect all video files from configured scan folders
             const folders = await scanFoldersService.findAll()
-            const files: string[] = []
+            const rawFiles: string[] = []
             for (const folder of folders) {
-              files.push(...collectVideoFiles(folder.path))
+              rawFiles.push(...collectVideoFiles(folder.path))
             }
+
+            // Deduplicate full paths (handles overlapping scan folders)
+            const uniqueFiles = [...new Set(rawFiles)]
+
+            // Skip files already registered in the library
+            const existingRows = await db.select({ filePath: movies.filePath }).from(movies)
+            const existingPaths = new Set(existingRows.map(r => r.filePath).filter(Boolean))
+            const files = uniqueFiles.filter(f => !existingPaths.has(f))
 
             const total = files.length
             controller.enqueue(sse({ type: 'start', total }))
