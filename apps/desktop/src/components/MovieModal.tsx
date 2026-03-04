@@ -1,5 +1,28 @@
 import { useEffect, useState } from 'react'
 import { X, Star, Calendar, Film, Pencil, Check, Trash2 } from 'lucide-react'
+
+function StarRating({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [hovered, setHovered] = useState<number | null>(null)
+  const current = hovered ?? (value ? Number(value) : 0)
+  return (
+    <div className="flex gap-0.5" onMouseLeave={() => setHovered(null)}>
+      {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+        <button
+          key={n}
+          type="button"
+          onMouseEnter={() => setHovered(n)}
+          onClick={() => onChange(n === Number(value) ? '' : String(n))}
+          className="text-neutral-300 dark:text-neutral-600 hover:scale-110 transition-transform"
+        >
+          <Star
+            size={16}
+            className={n <= current ? 'fill-yellow-400 text-yellow-400' : ''}
+          />
+        </button>
+      ))}
+    </div>
+  )
+}
 import { api, resolvePosterUrl } from '../lib/api'
 
 type MovieItem = NonNullable<Awaited<ReturnType<typeof api.movies.get>>['data']>[number]
@@ -224,23 +247,19 @@ export function MovieModal({ movieId, initialMovie, onClose, onDelete }: MovieMo
               value={form.originalTitle}
               onChange={(e) => setForm((f) => ({ ...f, originalTitle: e.target.value }))}
             />
-            <div className="flex gap-3">
-              <input
-                className={inputClass}
-                placeholder="Year"
-                type="number"
-                value={form.year}
-                onChange={(e) => setForm((f) => ({ ...f, year: e.target.value }))}
-              />
-              <input
-                className={inputClass}
-                placeholder="Rating (0–10)"
-                type="number"
-                step="0.1"
-                min="0"
-                max="10"
+            <div className="flex items-center gap-3">
+              <div className="w-20 shrink-0">
+                <input
+                  className={inputClass}
+                  placeholder="Year"
+                  type="number"
+                  value={form.year}
+                  onChange={(e) => setForm((f) => ({ ...f, year: e.target.value }))}
+                />
+              </div>
+              <StarRating
                 value={form.rating}
-                onChange={(e) => setForm((f) => ({ ...f, rating: e.target.value }))}
+                onChange={(v) => setForm((f) => ({ ...f, rating: v }))}
               />
             </div>
             <textarea
