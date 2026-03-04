@@ -10,9 +10,11 @@ export const moviesRouter = new Elysia({ prefix: '/movies' })
     async ({ body }) => {
       const { posterPath: externalUrl, ...rest } = body
       const movie = await moviesService.create({ ...rest, posterPath: externalUrl })
-      if (!movie) return null
+      if (!movie) { console.error('[movies] create returned undefined'); return null }
+      console.log(`[movies] Created movie ${movie.id} — externalUrl: ${externalUrl ?? 'none'}`)
       if (externalUrl) {
         const localPath = await downloadPoster(movie.id, externalUrl)
+        console.log(`[movies] downloadPoster result for ${movie.id}: ${localPath ?? 'null (failed)'}`)
         if (localPath) return moviesService.update(movie.id, { posterPath: localPath })
       }
       return movie

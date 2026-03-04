@@ -1,5 +1,6 @@
 import { join, dirname } from 'node:path'
 import { existsSync, mkdirSync, unlinkSync } from 'node:fs'
+import sharp from 'sharp'
 import { config } from '../config'
 
 export const postersDir = join(dirname(config.dbPath), 'posters')
@@ -8,19 +9,33 @@ if (!existsSync(postersDir)) {
   mkdirSync(postersDir, { recursive: true })
 }
 
+const SIZES = {
+  small: 185,
+  medium: 342,
+  big: 780,
+} as const
+
+type PosterSize = keyof typeof SIZES
+
 export async function downloadPoster(movieId: number, url: string): Promise<string | null> {
   try {
     const res = await fetch(url)
     if (!res.ok) return null
-    const buffer = await res.arrayBuffer()
-    await Bun.write(join(postersDir, `${movieId}.jpg`), buffer)
-    return `/assets/posters/${movieId}.jpg`
-  } catch {
+    const raw = Buffer.from(await res.arrayBuffer())
+    for (const [size, width] of Object.entries(SIZES) as [PosterSize, number][]) {
+      const buf = await sharp(raw).resize(width).jpeg({ quality: 85 }).toBuffer()
+      await Bun.write(join(postersDir, `${movieId}_${size}.jpg`), buf)
+    }
+    return `/assets/posters/${movieId}`
+  } catch (err) {
+    console.error(`[poster] FAILED for movie ${movieId}:`, err)
     return null
   }
 }
 
 export function deletePoster(movieId: number): void {
-  const filePath = join(postersDir, `${movieId}.jpg`)
-  if (existsSync(filePath)) unlinkSync(filePath)
+  for (const size of Object.keys(SIZES) as PosterSize[]) {
+    const filePath = join(postersDir, `${movieId}_${size}.jpg`)
+    if (existsSync(filePath)) unlinkSync(filePath)
+  }
 }

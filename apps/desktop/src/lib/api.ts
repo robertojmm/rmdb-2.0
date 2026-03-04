@@ -5,13 +5,18 @@ export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
 
 export const api = treaty<App>(API_URL)
 
+export type PosterSize = 'small' | 'medium' | 'big'
+
 /** Resolves a posterPath from the DB to a full image URL.
- *  - Local paths (/assets/posters/1) → prefixed with API_URL
+ *  - Local base paths (/assets/posters/20) → suffixed with size and extension
  *  - External URLs (https://...) → used as-is
  *  - null/undefined → default poster
  */
-export function resolvePosterUrl(path: string | null | undefined): string {
+export function resolvePosterUrl(path: string | null | undefined, size: PosterSize = 'medium'): string {
   if (!path) return `${API_URL}/assets/default_poster`
-  if (path.startsWith('/')) return `${API_URL}${path}`
+  if (path.startsWith('/')) {
+    if (/\.(jpg|jpeg|png|webp)$/i.test(path)) return `${API_URL}${path}` // legacy single-file format
+    return `${API_URL}${path}_${size}.jpg`
+  }
   return path
 }

@@ -95,8 +95,8 @@ export function MovieModal({ movieId, initialMovie, onClose, onDelete }: MovieMo
   }
 
   const posterSrc = isEditing
-    ? resolvePosterUrl(form.posterPath || null)
-    : resolvePosterUrl(movie.posterPath)
+    ? resolvePosterUrl(form.posterPath || null, 'big')
+    : resolvePosterUrl(movie.posterPath, 'big')
 
   return (
     <div
