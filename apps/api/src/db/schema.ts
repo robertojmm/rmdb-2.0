@@ -30,3 +30,13 @@ export const movies = sqliteTable('movies', {
     .notNull()
     .$defaultFn(() => new Date()),
 })
+
+export const movieDrafts = sqliteTable('movie_drafts', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  filePath: text('file_path').notNull().unique(),
+  parsedTitle: text('parsed_title'),
+  parsedYear: integer('parsed_year'),
+  savedAt: integer('saved_at', { mode: 'timestamp' })
+    .notNull()
+    .$defaultFn(() => new Date()),
+})

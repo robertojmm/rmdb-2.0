@@ -22,6 +22,13 @@
       "when": 1772485000000,
       "tag": "0002_add_scan_folders",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1772639750778,
+      "tag": "0003_add_movie_drafts",
+      "breakpoints": true
     }
   ]
 }
