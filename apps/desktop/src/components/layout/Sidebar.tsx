@@ -1,10 +1,11 @@
-import { Clapperboard, PlusCircle, Settings, Info } from 'lucide-react'
+import { Clapperboard, PlusCircle, Inbox, Settings, Info } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 const navItems = [
   { to: '/', end: true, icon: Clapperboard, labelKey: 'nav.library' },
   { to: '/add-movie', end: false, icon: PlusCircle, labelKey: 'nav.addMovie' },
+  { to: '/drafts', end: false, icon: Inbox, labelKey: 'nav.drafts' },
   { to: '/settings', end: false, icon: Settings, labelKey: 'nav.settings' },
 ] as const
 

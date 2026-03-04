@@ -2,6 +2,7 @@
   "nav": {
     "library": "Library",
     "addMovie": "Add Movie",
+    "drafts": "Drafts",
     "settings": "Settings",
     "about": "About"
   },
@@ -58,8 +59,19 @@
       "editManually": "Edit",
       "complete": "All done!",
       "addedCount": "{{count}} movies added to your library.",
-      "newScan": "New scan"
+      "newScan": "New scan",
+      "saveForLater": "Save all for later ({{count}})",
+      "saveOneForLater": "Save for later"
     }
+  },
+  "drafts": {
+    "title": "Drafts",
+    "empty": "No pending drafts.",
+    "emptyDesc": "Save unidentified scan files here to resolve them later.",
+    "selectTip": "Select a draft on the left to resolve it.",
+    "search": "Search in API",
+    "editManually": "Edit manually",
+    "discard": "Discard"
   },
   "settings": {
     "title": "Settings",

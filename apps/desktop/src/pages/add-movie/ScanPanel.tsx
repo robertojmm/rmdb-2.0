@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Folder, Play, CheckCircle2, SkipForward, Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Folder, Play, CheckCircle2, SkipForward, Plus, Pencil, Trash2, Bookmark, ChevronLeft, ChevronRight } from 'lucide-react'
 import { getLastApiSource, saveLastApiSource } from '../../lib/preferences'
 import { ApiSourceSelect, type ApiSource } from './ApiSourceSelect'
 import { MovieDraftModal } from './MovieDraftModal'
@@ -210,6 +210,27 @@ export function ScanPanel() {
     removeUnidentified(externalId)
   }
 
+  async function saveOneForLater(item: UnidentifiedResult) {
+    await api['movie-drafts'].post({
+      filePath: item.filePath,
+      parsedTitle: item.parsedTitle,
+      parsedYear: item.parsedYear ?? null,
+    })
+    removeUnidentified(item.filePath)
+  }
+
+  async function saveAllForLater() {
+    const items = [...unidentified]
+    for (const item of items) {
+      await api['movie-drafts'].post({
+        filePath: item.filePath,
+        parsedTitle: item.parsedTitle,
+        parsedYear: item.parsedYear ?? null,
+      })
+    }
+    setUnidentified([])
+  }
+
   function reset() {
     esRef.current?.close()
     setStatus('idle')
@@ -308,6 +329,7 @@ export function ScanPanel() {
           onAutoAdd={() => void autoAdd()}
           onStartReview={startReview}
           onGoToUnidentified={() => setStatus('unidentified')}
+          onSaveAllForLater={() => void saveAllForLater()}
         />
       )}
 
@@ -407,6 +429,13 @@ export function ScanPanel() {
                   {t('addMovie.search.editManually')}
                 </button>
                 <button
+                  onClick={() => void saveOneForLater(item)}
+                  title={t('addMovie.search.saveOneForLater')}
+                  className="shrink-0 text-neutral-300 dark:text-neutral-600 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+                >
+                  <Bookmark size={14} />
+                </button>
+                <button
                   onClick={() => removeUnidentified(item.filePath)}
                   className="shrink-0 text-neutral-300 dark:text-neutral-600 hover:text-red-500 dark:hover:text-red-400 transition-colors"
                 >
@@ -463,12 +492,13 @@ export function ScanPanel() {
 
 // ─── ChoosingView ─────────────────────────────────────────────────────────────
 
-function ChoosingView({ identified, unidentified, onAutoAdd, onStartReview, onGoToUnidentified }: {
+function ChoosingView({ identified, unidentified, onAutoAdd, onStartReview, onGoToUnidentified, onSaveAllForLater }: {
   identified: IdentifiedResult[]
   unidentified: UnidentifiedResult[]
   onAutoAdd: () => void
   onStartReview: () => void
   onGoToUnidentified: () => void
+  onSaveAllForLater: () => void
 }) {
   const { t } = useTranslation()
   const [identifiedPage, setIdentifiedPage] = useState(0)
@@ -556,34 +586,46 @@ function ChoosingView({ identified, unidentified, onAutoAdd, onStartReview, onGo
         <p className="text-sm text-neutral-400">{t('addMovie.search.noFiles')}</p>
       )}
 
-      {/* Action buttons */}
-      {identified.length > 0 && (
-        <div className="shrink-0 flex gap-3 mt-auto">
-          <button
-            onClick={onAutoAdd}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:opacity-80 transition-opacity"
-          >
-            <Plus size={14} />
-            {t('addMovie.search.autoAdd', { count: identified.length })}
-          </button>
-          <button
-            onClick={onStartReview}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
-          >
-            <Pencil size={14} />
-            {t('addMovie.search.reviewOne')}
-          </button>
+      {/* Action buttons — always pinned to bottom */}
+      {(identified.length > 0 || unidentified.length > 0) && (
+        <div className="shrink-0 flex flex-wrap gap-3 mt-auto">
+          {identified.length > 0 && (
+            <button
+              onClick={onAutoAdd}
+              className="flex items-center gap-1.5 px-4 py-2 text-sm bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:opacity-80 transition-opacity"
+            >
+              <Plus size={14} />
+              {t('addMovie.search.autoAdd', { count: identified.length })}
+            </button>
+          )}
+          {identified.length > 0 && (
+            <button
+              onClick={onStartReview}
+              className="flex items-center gap-1.5 px-4 py-2 text-sm border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+            >
+              <Pencil size={14} />
+              {t('addMovie.search.reviewOne')}
+            </button>
+          )}
+          {identified.length === 0 && unidentified.length > 0 && (
+            <button
+              onClick={onGoToUnidentified}
+              className="flex items-center gap-1.5 px-4 py-2 text-sm border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+            >
+              <Pencil size={14} />
+              {t('addMovie.search.reviewUnidentified')}
+            </button>
+          )}
+          {unidentified.length > 0 && (
+            <button
+              onClick={onSaveAllForLater}
+              className="flex items-center gap-1.5 px-4 py-2 text-sm border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+            >
+              <Bookmark size={14} />
+              {t('addMovie.search.saveForLater', { count: unidentified.length })}
+            </button>
+          )}
         </div>
-      )}
-
-      {/* If no identified but has unidentified, go straight to unidentified step */}
-      {identified.length === 0 && unidentified.length > 0 && (
-        <button
-          onClick={onGoToUnidentified}
-          className="self-start text-sm text-neutral-500 underline hover:text-neutral-700 dark:hover:text-neutral-300 mt-auto"
-        >
-          {t('addMovie.search.reviewUnidentified')}
-        </button>
       )}
     </div>
   )

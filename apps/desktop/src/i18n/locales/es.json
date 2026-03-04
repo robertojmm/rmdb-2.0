@@ -2,6 +2,7 @@
   "nav": {
     "library": "Biblioteca",
     "addMovie": "Añadir película",
+    "drafts": "Pendientes",
     "settings": "Configuración",
     "about": "Acerca de"
   },
@@ -58,8 +59,19 @@
       "editManually": "Editar",
       "complete": "¡Todo listo!",
       "addedCount": "{{count}} películas añadidas a tu biblioteca.",
-      "newScan": "Nuevo escaneo"
+      "newScan": "Nuevo escaneo",
+      "saveForLater": "Guardar todos para luego ({{count}})",
+      "saveOneForLater": "Guardar para luego"
     }
+  },
+  "drafts": {
+    "title": "Pendientes",
+    "empty": "No hay pendientes.",
+    "emptyDesc": "Guarda aquí los ficheros sin identificar del escaneo para resolverlos más tarde.",
+    "selectTip": "Selecciona un pendiente de la izquierda para resolverlo.",
+    "search": "Buscar en API",
+    "editManually": "Editar manualmente",
+    "discard": "Descartar"
   },
   "settings": {
     "title": "Configuración",
