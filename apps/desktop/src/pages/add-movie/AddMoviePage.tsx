@@ -24,7 +24,7 @@ export function AddMoviePage() {
         {t('addMovie.subtitle')}
       </p>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-3">
         {methods.map(({ id, icon: Icon, titleKey, descKey }) => {
           const isSelected = selected === id
           return (
@@ -32,7 +32,7 @@ export function AddMoviePage() {
               key={id}
               onClick={() => setSelected(id)}
               className={[
-                'group relative flex flex-col gap-5 p-6 rounded-2xl border text-left',
+                'group relative flex items-center gap-3 p-4 rounded-xl border text-left',
                 'transition-all duration-200 cursor-pointer',
                 isSelected
                   ? 'bg-neutral-900 dark:bg-white border-neutral-900 dark:border-white'
@@ -40,24 +40,24 @@ export function AddMoviePage() {
               ].join(' ')}
             >
               <div className={[
-                'self-start p-3 rounded-xl transition-colors duration-200',
+                'shrink-0 p-2 rounded-lg transition-colors duration-200',
                 isSelected ? 'bg-white/15 dark:bg-black/10' : 'bg-neutral-100 dark:bg-neutral-800',
               ].join(' ')}>
                 <Icon
-                  size={22}
+                  size={18}
                   className={isSelected ? 'text-white dark:text-neutral-900' : 'text-neutral-600 dark:text-neutral-300'}
                 />
               </div>
 
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className={[
-                  'font-semibold mb-1',
+                  'font-semibold text-sm',
                   isSelected ? 'text-white dark:text-neutral-900' : 'text-neutral-900 dark:text-white',
                 ].join(' ')}>
                   {t(titleKey)}
                 </p>
                 <p className={[
-                  'text-sm',
+                  'text-xs truncate',
                   isSelected ? 'text-neutral-400 dark:text-neutral-500' : 'text-neutral-500 dark:text-neutral-400',
                 ].join(' ')}>
                   {t(descKey)}
@@ -65,9 +65,9 @@ export function AddMoviePage() {
               </div>
 
               <ChevronRight
-                size={16}
+                size={14}
                 className={[
-                  'absolute bottom-5 right-5 transition-all duration-200',
+                  'shrink-0 transition-all duration-200',
                   isSelected
                     ? 'opacity-100 translate-x-0 text-neutral-400 dark:text-neutral-500'
                     : 'opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 text-neutral-400',

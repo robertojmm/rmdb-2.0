@@ -58,10 +58,6 @@ export function ScanPanel() {
   const [addingIndex, setAddingIndex] = useState(0)
   const [addedCount, setAddedCount] = useState(0)
 
-  // Pagination for the choosing screen
-  const [identifiedPage, setIdentifiedPage] = useState(0)
-  const [unidentifiedPage, setUnidentifiedPage] = useState(0)
-
   // Unidentified item being edited in MovieDraftModal
   const [editingItem, setEditingItem] = useState<UnidentifiedResult | null>(null)
 
@@ -89,8 +85,6 @@ export function ScanPanel() {
     setAddedCount(0)
     setReviewIndex(0)
     setAddingIndex(0)
-    setIdentifiedPage(0)
-    setUnidentifiedPage(0)
 
     const es = new EventSource(`${API_URL}/scan/stream?sourceId=${source.id}`)
     esRef.current = es
@@ -226,21 +220,12 @@ export function ScanPanel() {
     setReviewIndex(0)
     setAddedCount(0)
     setAddingIndex(0)
-    setIdentifiedPage(0)
-    setUnidentifiedPage(0)
   }
 
   // ── Derived ────────────────────────────────────────────────────────────────
 
-  const ITEMS_PER_PAGE = 5
-
   const pct = scanTotal > 0 ? Math.round((scanCurrent / scanTotal) * 100) : 0
   const currentReviewItem = identified[reviewIndex]
-
-  const identifiedPageCount = Math.ceil(identified.length / ITEMS_PER_PAGE)
-  const identifiedPageItems = identified.slice(identifiedPage * ITEMS_PER_PAGE, (identifiedPage + 1) * ITEMS_PER_PAGE)
-  const unidentifiedPageCount = Math.ceil(unidentified.length / ITEMS_PER_PAGE)
-  const unidentifiedPageItems = unidentified.slice(unidentifiedPage * ITEMS_PER_PAGE, (unidentifiedPage + 1) * ITEMS_PER_PAGE)
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -317,101 +302,13 @@ export function ScanPanel() {
 
       {/* ── CHOOSING ── */}
       {status === 'choosing' && (
-        <div className="flex-1 flex flex-col gap-5 min-h-0">
-          <p className="shrink-0 text-base font-semibold text-neutral-900 dark:text-white">
-            {t('addMovie.search.scanComplete')}
-          </p>
-
-          {/* Identified list */}
-          {identified.length > 0 && (
-            <div className="flex flex-col gap-2">
-              <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                {t('addMovie.search.identified', { count: identified.length })}
-              </p>
-              <ul className="flex flex-col gap-1.5">
-                {identifiedPageItems.map(item => (
-                  <li key={item.filePath} className="flex items-center gap-3 px-3 py-2 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
-                    <div className="shrink-0 w-8 h-11 rounded overflow-hidden bg-neutral-200 dark:bg-neutral-700">
-                      <img
-                        src={item.match.posterUrl ?? `${API_URL}/assets/default_poster`}
-                        alt={item.match.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 truncate">
-                        {item.match.title}
-                        {item.match.year && (
-                          <span className="text-neutral-400 font-normal ml-1.5">({item.match.year})</span>
-                        )}
-                      </p>
-                      <p className="text-xs text-neutral-400 truncate">{item.filePath}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <PaginationBar page={identifiedPage} total={identifiedPageCount} onChange={setIdentifiedPage} />
-            </div>
-          )}
-
-          {/* Unidentified list */}
-          {unidentified.length > 0 && (
-            <div className="flex flex-col gap-2">
-              <p className="text-xs font-medium text-amber-600 dark:text-amber-400">
-                {t('addMovie.search.notIdentified', { count: unidentified.length })}
-              </p>
-              <ul className="flex flex-col gap-1.5">
-                {unidentifiedPageItems.map(item => (
-                  <li key={item.filePath} className="px-3 py-2 bg-amber-50 dark:bg-amber-950/20 rounded-lg">
-                    <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 truncate">
-                      {item.parsedTitle}
-                      {item.parsedYear && (
-                        <span className="text-neutral-400 font-normal ml-1">({item.parsedYear})</span>
-                      )}
-                    </p>
-                    <p className="text-xs text-neutral-400 truncate">{item.filePath}</p>
-                  </li>
-                ))}
-              </ul>
-              <PaginationBar page={unidentifiedPage} total={unidentifiedPageCount} onChange={setUnidentifiedPage} />
-            </div>
-          )}
-
-          {/* No files at all */}
-          {identified.length === 0 && unidentified.length === 0 && (
-            <p className="text-sm text-neutral-400">{t('addMovie.search.noFiles')}</p>
-          )}
-
-          {/* Action buttons */}
-          {identified.length > 0 && (
-            <div className="shrink-0 flex gap-3 mt-auto">
-              <button
-                onClick={() => void autoAdd()}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:opacity-80 transition-opacity"
-              >
-                <Plus size={14} />
-                {t('addMovie.search.autoAdd', { count: identified.length })}
-              </button>
-              <button
-                onClick={startReview}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
-              >
-                <Pencil size={14} />
-                {t('addMovie.search.reviewOne')}
-              </button>
-            </div>
-          )}
-
-          {/* If no identified but has unidentified, go straight to unidentified step */}
-          {identified.length === 0 && unidentified.length > 0 && (
-            <button
-              onClick={() => setStatus('unidentified')}
-              className="self-start text-sm text-neutral-500 underline hover:text-neutral-700 dark:hover:text-neutral-300 mt-auto"
-            >
-              {t('addMovie.search.reviewUnidentified')}
-            </button>
-          )}
-        </div>
+        <ChoosingView
+          identified={identified}
+          unidentified={unidentified}
+          onAutoAdd={() => void autoAdd()}
+          onStartReview={startReview}
+          onGoToUnidentified={() => setStatus('unidentified')}
+        />
       )}
 
       {/* ── REVIEWING ── */}
@@ -559,6 +456,134 @@ export function ScanPanel() {
           onClose={() => setEditingItem(null)}
           onSaved={onUnidentifiedSaved}
         />
+      )}
+    </div>
+  )
+}
+
+// ─── ChoosingView ─────────────────────────────────────────────────────────────
+
+function ChoosingView({ identified, unidentified, onAutoAdd, onStartReview, onGoToUnidentified }: {
+  identified: IdentifiedResult[]
+  unidentified: UnidentifiedResult[]
+  onAutoAdd: () => void
+  onStartReview: () => void
+  onGoToUnidentified: () => void
+}) {
+  const { t } = useTranslation()
+  const [identifiedPage, setIdentifiedPage] = useState(0)
+  const [unidentifiedPage, setUnidentifiedPage] = useState(0)
+
+  const ITEMS_PER_PAGE = 5
+  const identifiedPageCount = Math.ceil(identified.length / ITEMS_PER_PAGE)
+  const identifiedPageItems = identified.slice(identifiedPage * ITEMS_PER_PAGE, (identifiedPage + 1) * ITEMS_PER_PAGE)
+  const unidentifiedPageCount = Math.ceil(unidentified.length / ITEMS_PER_PAGE)
+  const unidentifiedPageItems = unidentified.slice(unidentifiedPage * ITEMS_PER_PAGE, (unidentifiedPage + 1) * ITEMS_PER_PAGE)
+
+  // Preload poster images so page navigation is instant
+  useEffect(() => {
+    identified.forEach(item => {
+      if (item.match.posterUrl) {
+        const img = new window.Image()
+        img.src = item.match.posterUrl
+      }
+    })
+  }, [identified])
+
+  return (
+    <div className="flex-1 flex flex-col gap-5 min-h-0">
+      <p className="shrink-0 text-base font-semibold text-neutral-900 dark:text-white">
+        {t('addMovie.search.scanComplete')}
+      </p>
+
+      {/* Identified list */}
+      {identified.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
+            {t('addMovie.search.identified', { count: identified.length })}
+          </p>
+          <ul className="flex flex-col gap-1.5">
+            {identifiedPageItems.map((item, i) => (
+              <li key={i} className="flex items-center gap-3 px-3 py-2 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
+                <div className="shrink-0 w-8 h-11 rounded overflow-hidden bg-neutral-200 dark:bg-neutral-700">
+                  <img
+                    src={item.match.posterUrl ?? `${API_URL}/assets/default_poster`}
+                    alt={item.match.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 truncate">
+                    {item.match.title}
+                    {item.match.year && (
+                      <span className="text-neutral-400 font-normal ml-1.5">({item.match.year})</span>
+                    )}
+                  </p>
+                  <p className="text-xs text-neutral-400 truncate">{item.filePath}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <PaginationBar page={identifiedPage} total={identifiedPageCount} onChange={setIdentifiedPage} />
+        </div>
+      )}
+
+      {/* Unidentified list */}
+      {unidentified.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <p className="text-xs font-medium text-amber-600 dark:text-amber-400">
+            {t('addMovie.search.notIdentified', { count: unidentified.length })}
+          </p>
+          <ul className="flex flex-col gap-1.5">
+            {unidentifiedPageItems.map((item, i) => (
+              <li key={i} className="px-3 py-2 bg-amber-50 dark:bg-amber-950/20 rounded-lg">
+                <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 truncate">
+                  {item.parsedTitle}
+                  {item.parsedYear && (
+                    <span className="text-neutral-400 font-normal ml-1">({item.parsedYear})</span>
+                  )}
+                </p>
+                <p className="text-xs text-neutral-400 truncate">{item.filePath}</p>
+              </li>
+            ))}
+          </ul>
+          <PaginationBar page={unidentifiedPage} total={unidentifiedPageCount} onChange={setUnidentifiedPage} />
+        </div>
+      )}
+
+      {/* No files at all */}
+      {identified.length === 0 && unidentified.length === 0 && (
+        <p className="text-sm text-neutral-400">{t('addMovie.search.noFiles')}</p>
+      )}
+
+      {/* Action buttons */}
+      {identified.length > 0 && (
+        <div className="shrink-0 flex gap-3 mt-auto">
+          <button
+            onClick={onAutoAdd}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:opacity-80 transition-opacity"
+          >
+            <Plus size={14} />
+            {t('addMovie.search.autoAdd', { count: identified.length })}
+          </button>
+          <button
+            onClick={onStartReview}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+          >
+            <Pencil size={14} />
+            {t('addMovie.search.reviewOne')}
+          </button>
+        </div>
+      )}
+
+      {/* If no identified but has unidentified, go straight to unidentified step */}
+      {identified.length === 0 && unidentified.length > 0 && (
+        <button
+          onClick={onGoToUnidentified}
+          className="self-start text-sm text-neutral-500 underline hover:text-neutral-700 dark:hover:text-neutral-300 mt-auto"
+        >
+          {t('addMovie.search.reviewUnidentified')}
+        </button>
       )}
     </div>
   )
