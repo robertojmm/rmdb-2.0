@@ -7,8 +7,8 @@ type Movie = Awaited<ReturnType<typeof api.movies.get>>['data']
 type MovieList = NonNullable<Movie>
 type MovieItem = MovieList[number]
 
-const SIZE_COLS = { small: 8, medium: 5, big: 3 } as const
-type GridSize = keyof typeof SIZE_COLS
+const SIZE_MIN_WIDTH = { small: '130px', medium: '190px', big: '280px' } as const
+type GridSize = keyof typeof SIZE_MIN_WIDTH
 
 export function LibraryPage() {
   const { t } = useTranslation()
@@ -39,7 +39,7 @@ export function LibraryPage() {
           onChange={e => setSize(e.target.value as GridSize)}
           className="text-sm bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-1.5 focus:outline-none cursor-pointer"
         >
-          {(Object.keys(SIZE_COLS) as GridSize[]).map(s => (
+          {(Object.keys(SIZE_MIN_WIDTH) as GridSize[]).map(s => (
             <option key={s} value={s}>{t(`library.size.${s}`)}</option>
           ))}
         </select>
@@ -59,20 +59,20 @@ export function LibraryPage() {
 
       {!loading && !error && movies.length > 0 && (
         <div
-          className="grid gap-4 w-full"
-          style={{ gridTemplateColumns: `repeat(${SIZE_COLS[size]}, minmax(0, 1fr))` }}
+          className="grid gap-2 w-full"
+          style={{ gridTemplateColumns: `repeat(auto-fit, minmax(${SIZE_MIN_WIDTH[size]}, 1fr))` }}
         >
           {movies.map((movie) => (
             <div
               key={movie.id}
-              className="group h-[33vh] w-full relative overflow-hidden rounded-lg cursor-pointer"
+              className="group aspect-[2/3] w-full relative overflow-hidden rounded-lg cursor-pointer"
               onClick={() => setSelectedMovie(movie)}
             >
               <img
                 src={movie.posterPath ?? `${API_URL}/assets/default_poster`}
                 alt={movie.title}
                 loading="lazy"
-                className="w-full h-full object-contain transition-transform duration-200 group-hover:scale-105"
+                className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 rounded-lg" />
             </div>
