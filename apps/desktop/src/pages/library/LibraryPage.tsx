@@ -70,7 +70,7 @@ export function LibraryPage() {
               onClick={() => setSelectedMovie(movie)}
             >
               <img
-                src={resolvePosterUrl(movie.posterPath, 'small')}
+                src={resolvePosterUrl(movie.posterPath, size)}
                 alt={movie.title}
                 loading="lazy"
                 decoding="async"
