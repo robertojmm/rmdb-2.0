@@ -71,7 +71,8 @@
     "selectTip": "Selecciona un pendiente de la izquierda para resolverlo.",
     "search": "Buscar en API",
     "editManually": "Editar manualmente",
-    "discard": "Descartar"
+    "discard": "Descartar",
+    "discardAll": "Descartar todos"
   },
   "settings": {
     "title": "Configuración",

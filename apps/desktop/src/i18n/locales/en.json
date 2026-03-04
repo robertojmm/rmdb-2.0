@@ -71,7 +71,8 @@
     "selectTip": "Select a draft on the left to resolve it.",
     "search": "Search in API",
     "editManually": "Edit manually",
-    "discard": "Discard"
+    "discard": "Discard",
+    "discardAll": "Discard all"
   },
   "settings": {
     "title": "Settings",

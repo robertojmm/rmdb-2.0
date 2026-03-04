@@ -37,6 +37,14 @@ export function DraftsPage() {
     if (selected?.id === draft.id) setSelected(null)
   }
 
+  async function discardAll() {
+    for (const draft of drafts) {
+      await api['movie-drafts'][draft.id].delete()
+    }
+    setDrafts([])
+    setSelected(null)
+  }
+
   function onSaved(externalId: string) {
     // externalId is the filePath used as draft key
     const draft = drafts.find(d => d.filePath === externalId || d.id === selected?.id)
@@ -69,12 +77,23 @@ export function DraftsPage() {
 
   return (
     <div className="h-full flex flex-col gap-4">
-      <div>
-        <h1 className="text-2xl font-bold">{t('drafts.title')}</h1>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">{t('drafts.title')}</h1>
+          {drafts.length > 0 && (
+            <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+              {drafts.length} {drafts.length === 1 ? 'pending' : 'pending'}
+            </p>
+          )}
+        </div>
         {drafts.length > 0 && (
-          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-            {drafts.length} {drafts.length === 1 ? 'pending' : 'pending'}
-          </p>
+          <button
+            onClick={() => void discardAll()}
+            className="shrink-0 flex items-center gap-1.5 text-xs text-neutral-400 hover:text-red-500 dark:hover:text-red-400 transition-colors mt-1"
+          >
+            <Trash2 size={13} />
+            {t('drafts.discardAll')}
+          </button>
         )}
       </div>
 
