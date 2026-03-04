@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { X, Star, Calendar, Film, Pencil, Check, Trash2 } from 'lucide-react'
+import { X, Star, Calendar, Film, Pencil, Check, Trash2, FolderOpen } from 'lucide-react'
+import { open } from '@tauri-apps/plugin-dialog'
 
 function StarRating({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [hovered, setHovered] = useState<number | null>(null)
@@ -269,12 +270,24 @@ export function MovieModal({ movieId, initialMovie, onClose, onDelete }: MovieMo
               value={form.overview}
               onChange={(e) => setForm((f) => ({ ...f, overview: e.target.value }))}
             />
-            <input
-              className={inputClass}
-              placeholder="File path"
-              value={form.filePath}
-              onChange={(e) => setForm((f) => ({ ...f, filePath: e.target.value }))}
-            />
+            <div className="flex gap-2">
+              <input
+                className={inputClass}
+                placeholder="File path"
+                value={form.filePath}
+                onChange={(e) => setForm((f) => ({ ...f, filePath: e.target.value }))}
+              />
+              <button
+                type="button"
+                onClick={async () => {
+                  const selected = await open({ multiple: false, directory: false })
+                  if (typeof selected === 'string') setForm((f) => ({ ...f, filePath: selected }))
+                }}
+                className="shrink-0 px-2.5 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
+              >
+                <FolderOpen size={15} />
+              </button>
+            </div>
             <div className="flex gap-2 mt-auto pt-2">
               <button
                 onClick={() => void saveEdit()}
