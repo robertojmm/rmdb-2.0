@@ -50,22 +50,22 @@ export const scanRouter = new Elysia({ prefix: '/scan' })
             const total = files.length
             controller.enqueue(sse({ type: 'start', total }))
 
+            let processed = 0
             let found = 0
             let unidentified = 0
 
-            // Step 2: for each file, parse filename and search the selected API
-            for (let i = 0; i < files.length; i++) {
-              const filePath = files[i]!
+            // Step 2: search files concurrently in batches to avoid hammering the API
+            const CONCURRENCY = 5
+
+            async function processFile(filePath: string) {
               const filename = basename(filePath)
               const { title, year } = parseFilename(filename)
-
-              controller.enqueue(sse({ type: 'progress', current: i + 1, total, file: filename }))
-
               try {
                 const query = year ? `${title} ${year}` : title
                 const results = await apiSourcesService.search(sourceId, query)
                 const match = results[0]
-
+                processed++
+                controller.enqueue(sse({ type: 'progress', current: processed, total, file: filename }))
                 if (match) {
                   controller.enqueue(sse({ type: 'result', filePath, match }))
                   found++
@@ -74,9 +74,15 @@ export const scanRouter = new Elysia({ prefix: '/scan' })
                   unidentified++
                 }
               } catch {
+                processed++
+                controller.enqueue(sse({ type: 'progress', current: processed, total, file: filename }))
                 controller.enqueue(sse({ type: 'unidentified', filePath, parsedTitle: title, parsedYear: year }))
                 unidentified++
               }
+            }
+
+            for (let i = 0; i < files.length; i += CONCURRENCY) {
+              await Promise.all(files.slice(i, i + CONCURRENCY).map(processFile))
             }
 
             controller.enqueue(sse({ type: 'done', found, unidentified }))
