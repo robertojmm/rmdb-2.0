@@ -99,6 +99,7 @@ export function ApiPanel() {
                   <img
                     src={movie.posterUrl ?? `${API_URL}/assets/default_poster`}
                     alt={movie.title}
+                    decoding="async"
                     className="w-10 h-14 object-cover rounded-lg shrink-0 bg-neutral-200 dark:bg-neutral-700"
                   />
                   <div className="flex-1 min-w-0">

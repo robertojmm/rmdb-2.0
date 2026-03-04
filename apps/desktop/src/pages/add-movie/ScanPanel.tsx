@@ -345,6 +345,7 @@ export function ScanPanel() {
               <img
                 src={currentReviewItem.match.posterUrl ?? `${API_URL}/assets/default_poster`}
                 alt={currentReviewItem.match.title}
+                decoding="async"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -539,6 +540,7 @@ function ChoosingView({ identified, unidentified, onAutoAdd, onStartReview, onGo
                   <img
                     src={item.match.posterUrl ?? `${API_URL}/assets/default_poster`}
                     alt={item.match.title}
+                    decoding="async"
                     className="w-full h-full object-cover"
                   />
                 </div>
