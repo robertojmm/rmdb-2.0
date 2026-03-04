@@ -10,7 +10,12 @@
     "title": "Mi biblioteca",
     "empty": "Sin películas aún. ¡Añade la primera!",
     "loading": "Cargando...",
-    "error": "No se pudo conectar con la API."
+    "error": "No se pudo conectar con la API.",
+    "size": {
+      "small": "Pequeño",
+      "medium": "Mediano",
+      "big": "Grande"
+    }
   },
   "addMovie": {
     "title": "Añadir película",

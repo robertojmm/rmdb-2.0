@@ -7,15 +7,15 @@ type Movie = Awaited<ReturnType<typeof api.movies.get>>['data']
 type MovieList = NonNullable<Movie>
 type MovieItem = MovieList[number]
 
-const MIN_COLS = 3
-const MAX_COLS = 10
+const SIZE_COLS = { small: 8, medium: 5, big: 3 } as const
+type GridSize = keyof typeof SIZE_COLS
 
 export function LibraryPage() {
   const { t } = useTranslation()
   const [movies, setMovies] = useState<MovieList>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [cols, setCols] = useState(5)
+  const [size, setSize] = useState<GridSize>('medium')
   const [selectedMovie, setSelectedMovie] = useState<MovieItem | null>(null)
 
   useEffect(() => {
@@ -34,14 +34,15 @@ export function LibraryPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">{t('library.title')}</h1>
-        <input
-          type="range"
-          min={MIN_COLS}
-          max={MAX_COLS}
-          value={MAX_COLS + MIN_COLS - cols}
-          onChange={(e) => setCols(MAX_COLS + MIN_COLS - Number(e.target.value))}
-          className="w-32 accent-neutral-500 cursor-pointer"
-        />
+        <select
+          value={size}
+          onChange={e => setSize(e.target.value as GridSize)}
+          className="text-sm bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-1.5 focus:outline-none cursor-pointer"
+        >
+          {(Object.keys(SIZE_COLS) as GridSize[]).map(s => (
+            <option key={s} value={s}>{t(`library.size.${s}`)}</option>
+          ))}
+        </select>
       </div>
 
       {loading && (
@@ -59,7 +60,7 @@ export function LibraryPage() {
       {!loading && !error && movies.length > 0 && (
         <div
           className="grid gap-4 w-full"
-          style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+          style={{ gridTemplateColumns: `repeat(${SIZE_COLS[size]}, minmax(0, 1fr))` }}
         >
           {movies.map((movie) => (
             <div
@@ -70,6 +71,7 @@ export function LibraryPage() {
               <img
                 src={movie.posterPath ?? `${API_URL}/assets/default_poster`}
                 alt={movie.title}
+                loading="lazy"
                 className="w-full h-full object-contain transition-transform duration-200 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 rounded-lg" />
