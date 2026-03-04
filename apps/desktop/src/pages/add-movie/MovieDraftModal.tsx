@@ -1,11 +1,32 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { X, Check } from 'lucide-react'
+import { X, Check, Star, FolderOpen } from 'lucide-react'
+import { open } from '@tauri-apps/plugin-dialog'
 import { api, API_URL } from '../../lib/api'
 import type { SearchResult } from './ApiPanel'
 
 const inputClass =
   'w-full bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-900 dark:text-neutral-100 rounded-lg px-3 py-1.5 border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-1 focus:ring-neutral-400 dark:focus:ring-neutral-500'
+
+function StarRating({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [hovered, setHovered] = useState<number | null>(null)
+  const current = hovered ?? (value ? Number(value) : 0)
+  return (
+    <div className="flex gap-0.5" onMouseLeave={() => setHovered(null)}>
+      {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+        <button
+          key={n}
+          type="button"
+          onMouseEnter={() => setHovered(n)}
+          onClick={() => onChange(n === Number(value) ? '' : String(n))}
+          className="text-neutral-300 dark:text-neutral-600 hover:scale-110 transition-transform"
+        >
+          <Star size={16} className={n <= current ? 'fill-yellow-400 text-yellow-400' : ''} />
+        </button>
+      ))}
+    </div>
+  )
+}
 
 interface Props {
   draft: SearchResult
@@ -100,23 +121,19 @@ export function MovieDraftModal({ draft, initialFilePath, onClose, onSaved }: Pr
             value={form.originalTitle}
             onChange={e => setForm(f => ({ ...f, originalTitle: e.target.value }))}
           />
-          <div className="flex gap-3">
-            <input
-              className={inputClass}
-              placeholder="Year"
-              type="number"
-              value={form.year}
-              onChange={e => setForm(f => ({ ...f, year: e.target.value }))}
-            />
-            <input
-              className={inputClass}
-              placeholder="Rating (0–10)"
-              type="number"
-              step="0.1"
-              min="0"
-              max="10"
+          <div className="flex items-center gap-3">
+            <div className="w-20 shrink-0">
+              <input
+                className={inputClass}
+                placeholder="Year"
+                type="number"
+                value={form.year}
+                onChange={e => setForm(f => ({ ...f, year: e.target.value }))}
+              />
+            </div>
+            <StarRating
               value={form.rating}
-              onChange={e => setForm(f => ({ ...f, rating: e.target.value }))}
+              onChange={(v) => setForm(f => ({ ...f, rating: v }))}
             />
           </div>
           <textarea
@@ -126,12 +143,24 @@ export function MovieDraftModal({ draft, initialFilePath, onClose, onSaved }: Pr
             value={form.overview}
             onChange={e => setForm(f => ({ ...f, overview: e.target.value }))}
           />
-          <input
-            className={inputClass}
-            placeholder="File path"
-            value={form.filePath}
-            onChange={e => setForm(f => ({ ...f, filePath: e.target.value }))}
-          />
+          <div className="flex gap-2">
+            <input
+              className={inputClass}
+              placeholder="File path"
+              value={form.filePath}
+              onChange={e => setForm(f => ({ ...f, filePath: e.target.value }))}
+            />
+            <button
+              type="button"
+              onClick={async () => {
+                const selected = await open({ multiple: false, directory: false })
+                if (typeof selected === 'string') setForm(f => ({ ...f, filePath: selected }))
+              }}
+              className="shrink-0 px-2.5 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
+            >
+              <FolderOpen size={15} />
+            </button>
+          </div>
           <div className="flex gap-2 mt-auto pt-2">
             <button
               onClick={() => void handleSave()}
