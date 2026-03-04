@@ -10,12 +10,23 @@ type MovieItem = MovieList[number]
 const SIZE_MIN_WIDTH = { small: '130px', medium: '190px', big: '280px' } as const
 type GridSize = keyof typeof SIZE_MIN_WIDTH
 
+type SortKey = 'alpha' | 'rating' | 'newest' | 'oldest'
+
+function sortMovies(movies: MovieList, sort: SortKey): MovieList {
+  const sorted = [...movies]
+  if (sort === 'alpha') return sorted.sort((a, b) => a.title.localeCompare(b.title))
+  if (sort === 'rating') return sorted.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
+  if (sort === 'newest') return sorted.sort((a, b) => b.id - a.id)
+  return sorted.sort((a, b) => a.id - b.id)
+}
+
 export function LibraryPage() {
   const { t } = useTranslation()
   const [movies, setMovies] = useState<MovieList>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [size, setSize] = useState<GridSize>('medium')
+  const [sort, setSort] = useState<SortKey>('newest')
   const [selectedMovie, setSelectedMovie] = useState<MovieItem | null>(null)
 
   useEffect(() => {
@@ -34,15 +45,26 @@ export function LibraryPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">{t('library.title')}</h1>
-        <select
-          value={size}
-          onChange={e => setSize(e.target.value as GridSize)}
-          className="text-sm bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-1.5 focus:outline-none cursor-pointer"
-        >
-          {(Object.keys(SIZE_MIN_WIDTH) as GridSize[]).map(s => (
-            <option key={s} value={s}>{t(`library.size.${s}`)}</option>
-          ))}
-        </select>
+        <div className="flex gap-2">
+          <select
+            value={sort}
+            onChange={e => setSort(e.target.value as SortKey)}
+            className="text-sm bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-1.5 focus:outline-none cursor-pointer"
+          >
+            {(['alpha', 'rating', 'newest', 'oldest'] as SortKey[]).map(s => (
+              <option key={s} value={s}>{t(`library.sort.${s}`)}</option>
+            ))}
+          </select>
+          <select
+            value={size}
+            onChange={e => setSize(e.target.value as GridSize)}
+            className="text-sm bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-1.5 focus:outline-none cursor-pointer"
+          >
+            {(Object.keys(SIZE_MIN_WIDTH) as GridSize[]).map(s => (
+              <option key={s} value={s}>{t(`library.size.${s}`)}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {loading && (
@@ -62,7 +84,7 @@ export function LibraryPage() {
           className="grid gap-2 w-full"
           style={{ gridTemplateColumns: `repeat(auto-fit, minmax(${SIZE_MIN_WIDTH[size]}, 1fr))` }}
         >
-          {movies.map((movie) => (
+          {sortMovies(movies, sort).map((movie) => (
             <div
               key={movie.id}
               className="group aspect-[2/3] w-full relative overflow-hidden rounded-lg cursor-pointer"

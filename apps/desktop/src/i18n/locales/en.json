@@ -15,6 +15,12 @@
       "small": "Small",
       "medium": "Medium",
       "big": "Big"
+    },
+    "sort": {
+      "alpha": "A → Z",
+      "rating": "Best rated",
+      "newest": "Newest first",
+      "oldest": "Oldest first"
     }
   },
   "addMovie": {
