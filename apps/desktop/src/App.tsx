@@ -6,6 +6,7 @@ import { LibraryPage } from './pages/library/LibraryPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
 import { AboutPage } from './pages/about/AboutPage'
 import { DraftsPage } from './pages/drafts/DraftsPage'
+import { StatsPage } from './pages/stats/StatsPage'
 import './App.css'
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
             <Route index element={<LibraryPage />} />
             <Route path="add-movie" element={<AddMoviePage />} />
             <Route path="drafts" element={<DraftsPage />} />
+            <Route path="stats" element={<StatsPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="about" element={<AboutPage />} />
           </Route>

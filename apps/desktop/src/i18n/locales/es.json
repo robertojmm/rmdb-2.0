@@ -3,6 +3,7 @@
     "library": "Biblioteca",
     "addMovie": "Añadir película",
     "drafts": "Pendientes",
+    "stats": "Estadísticas",
     "settings": "Configuración",
     "about": "Acerca de",
     "collapse": "Contraer barra lateral",
@@ -93,6 +94,17 @@
     "editManually": "Editar manualmente",
     "discard": "Descartar",
     "discardAll": "Descartar todos"
+  },
+  "stats": {
+    "title": "Estadísticas",
+    "total": "Total de películas",
+    "watched": "Vistas",
+    "avgRating": "Valoración media",
+    "rated": "Valoradas",
+    "ofTotal": "del total",
+    "byDecade": "Películas por década",
+    "ratingDist": "Distribución de valoraciones",
+    "noData": "Sin datos aún."
   },
   "settings": {
     "title": "Configuración",

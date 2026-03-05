@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Clapperboard, PlusCircle, Inbox, Settings, Info, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { Clapperboard, PlusCircle, Inbox, BarChart2, Settings, Info, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -7,6 +7,7 @@ const navItems = [
   { to: '/', end: true, icon: Clapperboard, labelKey: 'nav.library' },
   { to: '/add-movie', end: false, icon: PlusCircle, labelKey: 'nav.addMovie' },
   { to: '/drafts', end: false, icon: Inbox, labelKey: 'nav.drafts' },
+  { to: '/stats', end: false, icon: BarChart2, labelKey: 'nav.stats' },
   { to: '/settings', end: false, icon: Settings, labelKey: 'nav.settings' },
 ] as const
 

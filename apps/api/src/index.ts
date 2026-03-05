@@ -6,6 +6,7 @@ import { apiSourcesRouter } from '@api-sources/api-sources.router'
 import { scanFoldersRouter } from '@scan-folders/scan-folders.router'
 import { scanRouter } from './scan/scan.router'
 import { movieDraftsRouter } from './movie-drafts/movie-drafts.router'
+import { statsRouter } from './stats/stats.router'
 import { postersDir } from '@movies/poster.service'
 import { version } from '../package.json'
 import { config } from './config'
@@ -52,6 +53,7 @@ const app = new Elysia()
   .use(scanFoldersRouter)
   .use(scanRouter)
   .use(movieDraftsRouter)
+  .use(statsRouter)
   .listen({
     hostname: "0.0.0.0",
     port: 3000

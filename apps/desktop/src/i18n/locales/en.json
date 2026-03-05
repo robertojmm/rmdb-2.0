@@ -3,6 +3,7 @@
     "library": "Library",
     "addMovie": "Add Movie",
     "drafts": "Drafts",
+    "stats": "Stats",
     "settings": "Settings",
     "about": "About",
     "collapse": "Collapse sidebar",
@@ -93,6 +94,17 @@
     "editManually": "Edit manually",
     "discard": "Discard",
     "discardAll": "Discard all"
+  },
+  "stats": {
+    "title": "Stats",
+    "total": "Total movies",
+    "watched": "Watched",
+    "avgRating": "Avg rating",
+    "rated": "Rated",
+    "ofTotal": "of total",
+    "byDecade": "Movies by decade",
+    "ratingDist": "Rating distribution",
+    "noData": "No data yet."
   },
   "settings": {
     "title": "Settings",
