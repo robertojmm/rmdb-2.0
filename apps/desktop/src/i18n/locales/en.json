@@ -143,7 +143,7 @@
   },
   "about": {
     "title": "About",
-    "description": "A personal movie library manager for your local collection.",
+    "description": "A personal movie library for your local collection. Scan your hard drive, identify films automatically, rate them, and keep track of what you've watched — all stored locally on your machine.",
     "builtWith": "Built with"
   }
 }
