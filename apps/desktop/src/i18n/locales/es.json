@@ -144,6 +144,14 @@
   "about": {
     "title": "Acerca de",
     "description": "Una biblioteca de películas personal para tu colección local. Escanea tu disco duro, identifica películas automáticamente, puntúalas y lleva un registro de lo que has visto — todo guardado en tu máquina.",
-    "builtWith": "Hecho con"
+    "builtWith": "Hecho con",
+    "clientVersion": "Cliente",
+    "serverVersion": "Servidor",
+    "serverUnreachable": "no disponible",
+    "server": {
+      "checking": "Conectando al servidor...",
+      "online": "Servidor en línea",
+      "offline": "No se pudo conectar al servidor"
+    }
   }
 }

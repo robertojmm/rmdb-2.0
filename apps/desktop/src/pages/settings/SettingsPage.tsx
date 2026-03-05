@@ -23,8 +23,6 @@ const selectClass =
 const inputClass =
   'w-full bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-900 dark:text-neutral-100 rounded-lg px-3 py-2 border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-1 focus:ring-neutral-400 dark:focus:ring-neutral-500'
 
-type ApiStatus = 'checking' | 'online' | 'offline'
-
 type ApiSource = {
   id: number
   name: string
@@ -45,8 +43,6 @@ type AppConfig = { dbPath: string; dataDir: string }
 export function SettingsPage() {
   const { t, i18n } = useTranslation()
   const { theme, setTheme } = useTheme()
-  const [apiStatus, setApiStatus] = useState<ApiStatus>('checking')
-  const [apiVersion, setApiVersion] = useState<string | null>(null)
   const [sources, setSources] = useState<ApiSource[]>([])
   const [modal, setModal] = useState<ConfiguringModal | null>(null)
   const [saving, setSaving] = useState(false)
@@ -54,18 +50,6 @@ export function SettingsPage() {
   const [appConfig, setAppConfig] = useState<AppConfig | null>(null)
   const [actualDbPath, setActualDbPath] = useState<string | null>(null)
   const [restartRequired, setRestartRequired] = useState(false)
-
-  useEffect(() => {
-    let cancelled = false
-    void (async () => {
-      const result = await api.health.get()
-      if (!cancelled) {
-        setApiStatus(result.error ? 'offline' : 'online')
-        setApiVersion(result.error ? null : result.data.version)
-      }
-    })()
-    return () => { cancelled = true }
-  }, [])
 
   useEffect(() => {
     void (async () => {
@@ -301,24 +285,6 @@ export function SettingsPage() {
           </button>
         </div>
       )}
-
-      {/* API status */}
-      <div className="mt-auto pt-6 border-t border-neutral-200 dark:border-neutral-800">
-        <p className="text-xs text-neutral-400 dark:text-neutral-500 mb-2">{t('settings.apiStatus.label')}</p>
-        <div className="flex items-center gap-2">
-          <span
-            className={`w-2 h-2 rounded-full ${apiStatus === 'checking'
-              ? 'bg-neutral-400 animate-pulse'
-              : apiStatus === 'online'
-                ? 'bg-green-500'
-                : 'bg-red-500'
-              }`}
-          />
-          <span className="text-sm text-neutral-600 dark:text-neutral-300">
-            {`${t(`settings.apiStatus.${apiStatus}`)}${apiStatus === 'online' ? ` - v${apiVersion}` : ''}`}
-          </span>
-        </div>
-      </div>
 
       {/* Configure modal */}
       {modal && (

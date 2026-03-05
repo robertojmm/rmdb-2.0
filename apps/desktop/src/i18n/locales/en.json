@@ -144,6 +144,14 @@
   "about": {
     "title": "About",
     "description": "A personal movie library for your local collection. Scan your hard drive, identify films automatically, rate them, and keep track of what you've watched — all stored locally on your machine.",
-    "builtWith": "Built with"
+    "builtWith": "Built with",
+    "clientVersion": "Client",
+    "serverVersion": "Server",
+    "serverUnreachable": "unavailable",
+    "server": {
+      "checking": "Connecting to server...",
+      "online": "Server online",
+      "offline": "Failed to connect to server"
+    }
   }
 }
