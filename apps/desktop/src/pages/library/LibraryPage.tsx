@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { ChevronUp } from 'lucide-react'
 import { api, resolvePosterUrl } from '../../lib/api'
 import { MovieModal } from '../../components/MovieModal'
 
@@ -28,6 +29,15 @@ export function LibraryPage() {
   const [size, setSize] = useState<GridSize>('medium')
   const [sort, setSort] = useState<SortKey>('newest')
   const [selectedMovie, setSelectedMovie] = useState<MovieItem | null>(null)
+  const [showScrollTop, setShowScrollTop] = useState(false)
+
+  useEffect(() => {
+    const main = document.querySelector('main')
+    if (!main) return
+    const onScroll = () => setShowScrollTop(main.scrollTop > 400)
+    main.addEventListener('scroll', onScroll)
+    return () => main.removeEventListener('scroll', onScroll)
+  }, [])
 
   useEffect(() => {
     void (async () => {
@@ -102,6 +112,15 @@ export function LibraryPage() {
             </div>
           ))}
         </div>
+      )}
+
+      {showScrollTop && (
+        <button
+          onClick={() => document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-6 right-6 p-2.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-full shadow-lg hover:opacity-80 transition-opacity z-40"
+        >
+          <ChevronUp size={20} />
+        </button>
       )}
 
       {selectedMovie && (
