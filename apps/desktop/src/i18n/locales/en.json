@@ -4,7 +4,9 @@
     "addMovie": "Add Movie",
     "drafts": "Drafts",
     "settings": "Settings",
-    "about": "About"
+    "about": "About",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
   },
   "library": {
     "title": "My Library",

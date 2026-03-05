@@ -4,7 +4,9 @@
     "addMovie": "Añadir película",
     "drafts": "Pendientes",
     "settings": "Configuración",
-    "about": "Acerca de"
+    "about": "Acerca de",
+    "collapse": "Contraer barra lateral",
+    "expand": "Expandir barra lateral"
   },
   "library": {
     "title": "Mi biblioteca",
