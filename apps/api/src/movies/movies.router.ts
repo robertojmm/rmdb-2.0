@@ -29,6 +29,7 @@ export const moviesRouter = new Elysia({ prefix: '/movies' })
         rating: t.Optional(t.Number()),
         posterPath: t.Optional(t.String()),
         filePath: t.Optional(t.String()),
+        watched: t.Optional(t.Boolean()),
       }),
     },
   )
@@ -45,6 +46,7 @@ export const moviesRouter = new Elysia({ prefix: '/movies' })
         rating: t.Optional(t.Number()),
         posterPath: t.Optional(t.String()),
         filePath: t.Optional(t.String()),
+        watched: t.Optional(t.Boolean()),
       }),
     },
   )

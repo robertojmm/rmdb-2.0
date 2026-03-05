@@ -46,6 +46,7 @@ export function MovieDraftModal({ draft, initialFilePath, onClose, onSaved }: Pr
     tmdbId: draft.tmdbId?.toString() ?? '',
     posterPath: draft.posterUrl ?? '',
     filePath: initialFilePath ?? '',
+    watched: false,
   })
   const [saving, setSaving] = useState(false)
 
@@ -66,6 +67,7 @@ export function MovieDraftModal({ draft, initialFilePath, onClose, onSaved }: Pr
       rating: form.rating ? Number(form.rating) : undefined,
       posterPath: form.posterPath || undefined,
       filePath: form.filePath || undefined,
+      watched: form.watched,
       tmdbId: form.tmdbId ? Number(form.tmdbId) : undefined,
     })
     setSaving(false)
@@ -161,6 +163,15 @@ export function MovieDraftModal({ draft, initialFilePath, onClose, onSaved }: Pr
               <FolderOpen size={15} />
             </button>
           </div>
+          <label className="flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-300 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={form.watched}
+              onChange={e => setForm(f => ({ ...f, watched: e.target.checked }))}
+              className="w-4 h-4 rounded accent-neutral-900 dark:accent-white cursor-pointer"
+            />
+            Watched
+          </label>
           <div className="flex gap-2 mt-auto pt-2">
             <button
               onClick={() => void handleSave()}

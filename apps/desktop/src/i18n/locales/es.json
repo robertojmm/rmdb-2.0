@@ -21,6 +21,11 @@
       "rating": "Mejor valoradas",
       "newest": "Más recientes",
       "oldest": "Más antiguas"
+    },
+    "filter": {
+      "all": "Todas",
+      "watched": "Vistas",
+      "unwatched": "No vistas"
     }
   },
   "addMovie": {

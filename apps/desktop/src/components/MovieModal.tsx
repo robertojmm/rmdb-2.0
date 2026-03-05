@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { X, Star, Calendar, Film, Pencil, Check, Trash2, FolderOpen, Play } from 'lucide-react'
+import { X, Star, Calendar, Film, Pencil, Check, Trash2, FolderOpen, Play, Eye, EyeOff } from 'lucide-react'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openPath } from '@tauri-apps/plugin-opener'
 
@@ -39,6 +39,7 @@ type MovieForm = {
   tmdbId: string
   posterPath: string
   filePath: string
+  watched: boolean
 }
 
 interface MovieModalProps {
@@ -46,12 +47,13 @@ interface MovieModalProps {
   initialMovie: MovieItem
   onClose: () => void
   onDelete: (id: number) => void
+  onUpdate?: (movie: MovieItem) => void
 }
 
 const inputClass =
   'w-full bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-900 dark:text-neutral-100 rounded-lg px-3 py-1.5 border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-1 focus:ring-neutral-400 dark:focus:ring-neutral-500'
 
-export function MovieModal({ movieId, initialMovie, onClose, onDelete }: MovieModalProps) {
+export function MovieModal({ movieId, initialMovie, onClose, onDelete, onUpdate }: MovieModalProps) {
   const [movie, setMovie] = useState<MovieDetail>(initialMovie)
   const [isEditing, setIsEditing] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -64,6 +66,7 @@ export function MovieModal({ movieId, initialMovie, onClose, onDelete }: MovieMo
     tmdbId: '',
     posterPath: '',
     filePath: '',
+    watched: false,
   })
 
   useEffect(() => {
@@ -95,6 +98,7 @@ export function MovieModal({ movieId, initialMovie, onClose, onDelete }: MovieMo
       tmdbId: movie.tmdbId?.toString() ?? '',
       posterPath: movie.posterPath ?? '',
       filePath: movie.filePath ?? '',
+      watched: movie.watched ?? false,
     })
     setIsEditing(true)
   }
@@ -109,9 +113,15 @@ export function MovieModal({ movieId, initialMovie, onClose, onDelete }: MovieMo
       tmdbId: form.tmdbId ? Number(form.tmdbId) : undefined,
       posterPath: form.posterPath || undefined,
       filePath: form.filePath || undefined,
+      watched: form.watched,
     })
-    if (result.data) setMovie(result.data)
+    if (result.data) { setMovie(result.data); onUpdate?.(result.data) }
     setIsEditing(false)
+  }
+
+  async function toggleWatched() {
+    const result = await api.movies[String(movieId)].patch({ watched: !movie.watched })
+    if (result.data) { setMovie(result.data); onUpdate?.(result.data) }
   }
 
   async function deleteMovie() {
@@ -190,6 +200,17 @@ export function MovieModal({ movieId, initialMovie, onClose, onDelete }: MovieMo
                   {movie.rating}
                 </span>
               )}
+              <button
+                onClick={() => void toggleWatched()}
+                className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium transition-colors ${
+                  movie.watched
+                    ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400'
+                    : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
+                }`}
+              >
+                {movie.watched ? <Eye size={12} /> : <EyeOff size={12} />}
+                {movie.watched ? 'Watched' : 'Unwatched'}
+              </button>
             </div>
 
             {movie.overview && (
@@ -307,6 +328,15 @@ export function MovieModal({ movieId, initialMovie, onClose, onDelete }: MovieMo
                 <FolderOpen size={15} />
               </button>
             </div>
+            <label className="flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-300 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={form.watched}
+                onChange={e => setForm(f => ({ ...f, watched: e.target.checked }))}
+                className="w-4 h-4 rounded accent-neutral-900 dark:accent-white cursor-pointer"
+              />
+              Watched
+            </label>
             <div className="flex gap-2 mt-auto pt-2">
               <button
                 onClick={() => void saveEdit()}

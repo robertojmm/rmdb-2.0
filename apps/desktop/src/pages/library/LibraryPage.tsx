@@ -12,6 +12,13 @@ const SIZE_MIN_WIDTH = { small: '130px', medium: '190px', big: '280px' } as cons
 type GridSize = keyof typeof SIZE_MIN_WIDTH
 
 type SortKey = 'alpha' | 'rating' | 'newest' | 'oldest'
+type FilterKey = 'all' | 'watched' | 'unwatched'
+
+function filterMovies(movies: MovieList, filter: FilterKey): MovieList {
+  if (filter === 'watched') return movies.filter(m => m.watched)
+  if (filter === 'unwatched') return movies.filter(m => !m.watched)
+  return movies
+}
 
 function sortMovies(movies: MovieList, sort: SortKey): MovieList {
   const sorted = [...movies]
@@ -28,6 +35,7 @@ export function LibraryPage() {
   const [error, setError] = useState<string | null>(null)
   const [size, setSize] = useState<GridSize>('medium')
   const [sort, setSort] = useState<SortKey>('newest')
+  const [filter, setFilter] = useState<FilterKey>('all')
   const [selectedMovie, setSelectedMovie] = useState<MovieItem | null>(null)
   const [showScrollTop, setShowScrollTop] = useState(false)
 
@@ -56,6 +64,15 @@ export function LibraryPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">{t('library.title')}</h1>
         <div className="flex gap-2">
+          <select
+            value={filter}
+            onChange={e => setFilter(e.target.value as FilterKey)}
+            className="text-sm bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-1.5 focus:outline-none cursor-pointer"
+          >
+            {(['all', 'watched', 'unwatched'] as FilterKey[]).map(f => (
+              <option key={f} value={f}>{t(`library.filter.${f}`)}</option>
+            ))}
+          </select>
           <select
             value={sort}
             onChange={e => setSort(e.target.value as SortKey)}
@@ -94,7 +111,7 @@ export function LibraryPage() {
           className="grid gap-2 w-full"
           style={{ gridTemplateColumns: `repeat(auto-fit, minmax(${SIZE_MIN_WIDTH[size]}, 1fr))` }}
         >
-          {sortMovies(movies, sort).map((movie) => (
+          {sortMovies(filterMovies(movies, filter), sort).map((movie) => (
             <div
               key={movie.id}
               className="group aspect-[2/3] w-full relative overflow-hidden rounded-lg cursor-pointer"
@@ -128,6 +145,7 @@ export function LibraryPage() {
           movieId={selectedMovie.id}
           initialMovie={selectedMovie}
           onClose={() => setSelectedMovie(null)}
+          onUpdate={(updated) => setMovies(ms => ms.map(m => m.id === updated.id ? updated : m))}
           onDelete={(id) => {
             setMovies(ms => ms.filter(m => m.id !== id))
             setSelectedMovie(null)

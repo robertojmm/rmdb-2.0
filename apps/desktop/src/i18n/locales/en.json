@@ -21,6 +21,11 @@
       "rating": "Best rated",
       "newest": "Newest first",
       "oldest": "Oldest first"
+    },
+    "filter": {
+      "all": "All",
+      "watched": "Watched",
+      "unwatched": "Unwatched"
     }
   },
   "addMovie": {

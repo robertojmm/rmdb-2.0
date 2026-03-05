@@ -26,6 +26,7 @@ export const movies = sqliteTable('movies', {
   rating: real('rating'),
   posterPath: text('poster_path'),
   filePath: text('file_path'),
+  watched: integer('watched', { mode: 'boolean' }).notNull().default(false),
   addedAt: integer('added_at', { mode: 'timestamp' })
     .notNull()
     .$defaultFn(() => new Date()),
