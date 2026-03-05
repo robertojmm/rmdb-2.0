@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { ChevronUp } from 'lucide-react'
 import { api, resolvePosterUrl } from '../../lib/api'
 import { MovieModal } from '../../components/MovieModal'
+import { logger } from '../../lib/logger'
 
 type Movie = Awaited<ReturnType<typeof api.movies.get>>['data']
 type MovieList = NonNullable<Movie>
@@ -51,6 +52,7 @@ export function LibraryPage() {
     void (async () => {
       const result = await api.movies.get()
       if (result.error) {
+        logger.error('Failed to load library', { error: String(result.error) })
         setError(String(result.error))
       } else {
         setMovies(result.data ?? [])

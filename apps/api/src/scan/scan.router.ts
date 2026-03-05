@@ -6,6 +6,7 @@ import { apiSourcesService } from '../api-sources/api-sources.service'
 import { parseFilename } from './filename-parser'
 import { db } from '@db'
 import { movies } from '@db/schema'
+import { logger } from '../logger'
 
 const VIDEO_EXTS = new Set([
   '.mkv', '.mp4', '.avi', '.mov', '.wmv', '.m4v', '.flv', '.ts', '.webm', '.divx', '.mpg', '.mpeg',
@@ -41,6 +42,7 @@ export const scanRouter = new Elysia({ prefix: '/scan' })
 
       const stream = new ReadableStream<Uint8Array>({
         async start(controller) {
+          const scanStart = Date.now()
           try {
             // Step 1: collect all video files from configured scan folders
             const folders = await scanFoldersService.findAll()
@@ -58,6 +60,12 @@ export const scanRouter = new Elysia({ prefix: '/scan' })
             const files = uniqueFiles.filter(f => !existingPaths.has(f))
 
             const total = files.length
+            logger.info('Scan started', {
+              sourceId,
+              folders: folders.length,
+              totalFiles: total,
+              alreadyInLibrary: uniqueFiles.length - total,
+            })
             controller.enqueue(sse({ type: 'start', total }))
 
             let processed = 0
@@ -83,7 +91,8 @@ export const scanRouter = new Elysia({ prefix: '/scan' })
                   controller.enqueue(sse({ type: 'unidentified', filePath, parsedTitle: title, parsedYear: year }))
                   unidentified++
                 }
-              } catch {
+              } catch (err) {
+                logger.error('File search failed', { file: filename, sourceId, error: String(err) })
                 processed++
                 controller.enqueue(sse({ type: 'progress', current: processed, total, file: filename }))
                 controller.enqueue(sse({ type: 'unidentified', filePath, parsedTitle: title, parsedYear: year }))
@@ -95,8 +104,14 @@ export const scanRouter = new Elysia({ prefix: '/scan' })
               await Promise.all(files.slice(i, i + CONCURRENCY).map(processFile))
             }
 
+            logger.info('Scan completed', {
+              found,
+              unidentified,
+              durationMs: Date.now() - scanStart,
+            })
             controller.enqueue(sse({ type: 'done', found, unidentified }))
           } catch (err) {
+            logger.error('Scan failed', { error: String(err), durationMs: Date.now() - scanStart })
             controller.enqueue(sse({ type: 'error', message: String(err) }))
           } finally {
             controller.close()

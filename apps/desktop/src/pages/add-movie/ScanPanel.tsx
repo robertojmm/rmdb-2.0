@@ -5,6 +5,7 @@ import { getLastApiSource, saveLastApiSource } from '../../lib/preferences'
 import { ApiSourceSelect, type ApiSource } from './ApiSourceSelect'
 import { MovieDraftModal } from './MovieDraftModal'
 import { api, API_URL } from '../../lib/api'
+import { logger } from '../../lib/logger'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -90,7 +91,13 @@ export function ScanPanel() {
     esRef.current = es
 
     es.onmessage = (e: MessageEvent<string>) => {
-      const event = JSON.parse(e.data) as ScanEvent
+      let event: ScanEvent
+      try {
+        event = JSON.parse(e.data) as ScanEvent
+      } catch (err) {
+        logger.error('Failed to parse SSE event', { data: e.data, error: String(err) })
+        return
+      }
 
       switch (event.type) {
         case 'start':
@@ -112,6 +119,7 @@ export function ScanPanel() {
           setStatus('choosing')
           break
         case 'error':
+          logger.error('Scan error from server', { message: event.message })
           es.close()
           setStatus('idle')
           break
@@ -122,7 +130,10 @@ export function ScanPanel() {
       es.close()
       // Don't reset if scan already completed — server closing the SSE connection
       // after sending 'done' fires onerror, which would clobber the 'choosing' state
-      setStatus(prev => prev === 'scanning' ? 'idle' : prev)
+      setStatus(prev => {
+        if (prev === 'scanning') logger.error('SSE stream connection lost during scan')
+        return prev === 'scanning' ? 'idle' : prev
+      })
     }
   }
 

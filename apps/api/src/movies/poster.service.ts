@@ -2,6 +2,7 @@ import { join, dirname } from 'node:path'
 import { existsSync, mkdirSync, unlinkSync } from 'node:fs'
 import sharp from 'sharp'
 import { config } from '../config'
+import { logger } from '../logger'
 
 export const postersDir = join(dirname(config.dbPath), 'posters')
 
@@ -28,7 +29,7 @@ export async function downloadPoster(movieId: number, url: string): Promise<stri
     }
     return `/assets/posters/${movieId}`
   } catch (err) {
-    console.error(`[poster] FAILED for movie ${movieId}:`, err)
+    logger.error('Poster download failed', { movieId, url, error: String(err) })
     return null
   }
 }

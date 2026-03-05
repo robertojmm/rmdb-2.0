@@ -5,6 +5,7 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { invoke } from '@tauri-apps/api/core'
 import { type Theme, useTheme } from '../../context/ThemeContext'
 import { api } from '../../lib/api'
+import { logger } from '../../lib/logger'
 
 const LANGUAGES = [
   { code: 'en', labelKey: 'settings.languages.en' },
@@ -81,13 +82,18 @@ export function SettingsPage() {
   async function changeDataDir() {
     const selected = await open({ directory: true, multiple: false, defaultPath: appConfig?.dataDir })
     if (!selected) return
-    await invoke('set_data_dir', {
-      newDir: selected as string,
-      moveFiles: true,
-      currentDbPath: actualDbPath,
-    })
-    setAppConfig({ dataDir: selected as string, dbPath: `${selected as string}/rmdb.sqlite` })
-    setRestartRequired(true)
+    try {
+      logger.info('Data directory change initiated', { from: appConfig?.dataDir, to: selected })
+      await invoke('set_data_dir', {
+        newDir: selected as string,
+        moveFiles: true,
+        currentDbPath: actualDbPath,
+      })
+      setAppConfig({ dataDir: selected as string, dbPath: `${selected as string}/rmdb.sqlite` })
+      setRestartRequired(true)
+    } catch (err) {
+      logger.error('Failed to change data directory', { error: String(err) })
+    }
   }
 
   function openModal(source: ApiSource) {

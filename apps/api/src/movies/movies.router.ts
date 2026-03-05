@@ -1,6 +1,7 @@
 import { Elysia, t } from 'elysia'
 import { moviesService } from './movies.service'
 import { downloadPoster, deletePoster } from './poster.service'
+import { logger } from '../logger'
 
 export const moviesRouter = new Elysia({ prefix: '/movies' })
   .get('/', () => moviesService.findAll())
@@ -10,11 +11,13 @@ export const moviesRouter = new Elysia({ prefix: '/movies' })
     async ({ body }) => {
       const { posterPath: externalUrl, ...rest } = body
       const movie = await moviesService.create({ ...rest, posterPath: externalUrl })
-      if (!movie) { console.error('[movies] create returned undefined'); return null }
-      console.log(`[movies] Created movie ${movie.id} — externalUrl: ${externalUrl ?? 'none'}`)
+      if (!movie) {
+        logger.error('Movie creation returned undefined', { title: body.title })
+        return null
+      }
+      logger.info('Movie created', { id: movie.id, title: movie.title, year: movie.year })
       if (externalUrl) {
         const localPath = await downloadPoster(movie.id, externalUrl)
-        console.log(`[movies] downloadPoster result for ${movie.id}: ${localPath ?? 'null (failed)'}`)
         if (localPath) return moviesService.update(movie.id, { posterPath: localPath })
       }
       return movie
@@ -50,8 +53,10 @@ export const moviesRouter = new Elysia({ prefix: '/movies' })
       }),
     },
   )
-  .delete('/:id', ({ params }) => {
+  .delete('/:id', async ({ params }) => {
     const id = Number(params.id)
     deletePoster(id)
-    return moviesService.delete(id)
+    const result = await moviesService.delete(id)
+    logger.info('Movie deleted', { id })
+    return result
   })
