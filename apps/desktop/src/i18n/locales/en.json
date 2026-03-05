@@ -28,7 +28,9 @@
       "all": "All",
       "watched": "Watched",
       "unwatched": "Unwatched"
-    }
+    },
+    "search": "Search...",
+    "noResults": "No movies match your search."
   },
   "addMovie": {
     "title": "Add Movie",

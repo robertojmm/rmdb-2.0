@@ -28,7 +28,9 @@
       "all": "Todas",
       "watched": "Vistas",
       "unwatched": "No vistas"
-    }
+    },
+    "search": "Buscar...",
+    "noResults": "Ninguna película coincide con tu búsqueda."
   },
   "addMovie": {
     "title": "Añadir película",

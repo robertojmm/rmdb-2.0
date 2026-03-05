@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ChevronUp } from 'lucide-react'
+import { ChevronUp, Search, X } from 'lucide-react'
 import { api, resolvePosterUrl } from '../../lib/api'
 import { MovieModal } from '../../components/MovieModal'
 import { logger } from '../../lib/logger'
@@ -15,10 +15,19 @@ type GridSize = keyof typeof SIZE_MIN_WIDTH
 type SortKey = 'alpha' | 'rating' | 'newest' | 'oldest'
 type FilterKey = 'all' | 'watched' | 'unwatched'
 
-function filterMovies(movies: MovieList, filter: FilterKey): MovieList {
-  if (filter === 'watched') return movies.filter(m => m.watched)
-  if (filter === 'unwatched') return movies.filter(m => !m.watched)
-  return movies
+function filterMovies(movies: MovieList, filter: FilterKey, query: string): MovieList {
+  let result = movies
+  if (filter === 'watched') result = result.filter(m => m.watched)
+  else if (filter === 'unwatched') result = result.filter(m => !m.watched)
+  if (query) {
+    const q = query.toLowerCase()
+    result = result.filter(m =>
+      m.title.toLowerCase().includes(q) ||
+      (m.originalTitle?.toLowerCase().includes(q) ?? false) ||
+      (m.year?.toString().includes(q) ?? false)
+    )
+  }
+  return result
 }
 
 function sortMovies(movies: MovieList, sort: SortKey): MovieList {
@@ -39,6 +48,8 @@ export function LibraryPage() {
   const [filter, setFilter] = useState<FilterKey>('all')
   const [selectedMovie, setSelectedMovie] = useState<MovieItem | null>(null)
   const [showScrollTop, setShowScrollTop] = useState(false)
+  const [query, setQuery] = useState('')
+  const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const main = document.querySelector('main')
@@ -61,11 +72,32 @@ export function LibraryPage() {
     })()
   }, [])
 
+  const visibleMovies = sortMovies(filterMovies(movies, filter, query), sort)
+
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">{t('library.title')}</h1>
-        <div className="flex gap-2">
+      <div className="flex items-center justify-between mb-6 gap-4">
+        <h1 className="text-2xl font-bold shrink-0">{t('library.title')}</h1>
+        <div className="flex items-center gap-2 flex-1 justify-end">
+          <div className="relative">
+            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
+            <input
+              ref={searchRef}
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder={t('library.search')}
+              className="text-sm bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 rounded-lg pl-8 pr-7 py-1.5 w-52 focus:outline-none focus:w-72 transition-all duration-200 placeholder:text-neutral-400"
+            />
+            {query && (
+              <button
+                onClick={() => { setQuery(''); searchRef.current?.focus() }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
+              >
+                <X size={13} />
+              </button>
+            )}
+          </div>
           <select
             value={filter}
             onChange={e => setFilter(e.target.value as FilterKey)}
@@ -108,12 +140,16 @@ export function LibraryPage() {
         <p className="text-neutral-400 dark:text-neutral-500">{t('library.empty')}</p>
       )}
 
-      {!loading && !error && movies.length > 0 && (
+      {!loading && !error && movies.length > 0 && visibleMovies.length === 0 && (
+        <p className="text-neutral-400 dark:text-neutral-500">{t('library.noResults')}</p>
+      )}
+
+      {!loading && !error && visibleMovies.length > 0 && (
         <div
           className="grid gap-2 w-full"
           style={{ gridTemplateColumns: `repeat(auto-fit, minmax(${SIZE_MIN_WIDTH[size]}, 1fr))` }}
         >
-          {sortMovies(filterMovies(movies, filter), sort).map((movie) => (
+          {visibleMovies.map((movie) => (
             <div
               key={movie.id}
               className="group aspect-[2/3] w-full relative overflow-hidden rounded-lg cursor-pointer"
