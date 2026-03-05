@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { X, Star, Calendar, Film, Pencil, Check, Trash2, FolderOpen } from 'lucide-react'
+import { X, Star, Calendar, Film, Pencil, Check, Trash2, FolderOpen, Play } from 'lucide-react'
 import { open } from '@tauri-apps/plugin-dialog'
+import { openPath } from '@tauri-apps/plugin-opener'
 
 function StarRating({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [hovered, setHovered] = useState<number | null>(null)
@@ -198,12 +199,30 @@ export function MovieModal({ movieId, initialMovie, onClose, onDelete }: MovieMo
             )}
 
             <div className="flex items-center justify-between mt-auto pt-2">
-              {movie.filePath ? (
-                <p className="flex items-center gap-1.5 text-xs text-neutral-400 truncate min-w-0">
-                  <Film size={12} className="shrink-0" />
-                  {movie.filePath}
-                </p>
-              ) : <span />}
+              <div className="flex items-center gap-3 min-w-0">
+                <button
+                  onClick={() => {
+                    console.log('[play] filePath:', movie.filePath)
+                    if (movie.filePath) {
+                      openPath(movie.filePath)
+                        .then(() => console.log('[play] openPath OK'))
+                        .catch((e) => console.error('[play] openPath ERROR:', e))
+                    }
+                  }}
+                  disabled={!movie.filePath}
+                  title={movie.filePath ? 'Play' : 'No file associated'}
+                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <Play size={12} />
+                  Play
+                </button>
+                {movie.filePath && (
+                  <p className="flex items-center gap-1.5 text-xs text-neutral-400 truncate min-w-0">
+                    <Film size={12} className="shrink-0" />
+                    {movie.filePath}
+                  </p>
+                )}
+              </div>
 
               {confirmDelete ? (
                 <div className="flex items-center gap-2 shrink-0">
