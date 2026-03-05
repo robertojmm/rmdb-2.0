@@ -147,7 +147,7 @@ export function LibraryPage() {
       {!loading && !error && visibleMovies.length > 0 && (
         <div
           className="grid gap-2 w-full"
-          style={{ gridTemplateColumns: `repeat(auto-fit, minmax(${SIZE_MIN_WIDTH[size]}, 1fr))` }}
+          style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${SIZE_MIN_WIDTH[size]}, 1fr))` }}
         >
           {visibleMovies.map((movie) => (
             <div
