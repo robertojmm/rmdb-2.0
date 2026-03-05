@@ -94,6 +94,7 @@
   },
   "settings": {
     "title": "Settings",
+    "appearance": "Appearance",
     "language": "Language",
     "languages": {
       "en": "English",

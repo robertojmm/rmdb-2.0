@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Settings2, X, Check, FolderPlus, Trash2, FolderOpen, RotateCcw } from 'lucide-react'
+import { Settings2, X, Check, FolderPlus, Trash2, FolderOpen, RotateCcw, HardDrive } from 'lucide-react'
 import { open } from '@tauri-apps/plugin-dialog'
 import { invoke } from '@tauri-apps/api/core'
 import { type Theme, useTheme } from '../../context/ThemeContext'
@@ -18,10 +18,15 @@ const THEMES = [
 ] as const
 
 const selectClass =
-  'bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 text-sm rounded-lg px-3 py-2 border border-neutral-300 dark:border-neutral-700 focus:outline-none focus:ring-1 focus:ring-neutral-400 dark:focus:ring-neutral-500 cursor-pointer'
+  'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 text-sm rounded-lg px-3 py-1.5 border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-1 focus:ring-neutral-400 dark:focus:ring-neutral-500 cursor-pointer'
 
 const inputClass =
   'w-full bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-900 dark:text-neutral-100 rounded-lg px-3 py-2 border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-1 focus:ring-neutral-400 dark:focus:ring-neutral-500'
+
+const sectionLabel = 'text-[11px] font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mb-2'
+const card = 'rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 overflow-hidden'
+const cardRow = 'flex items-center justify-between px-4 py-3'
+const actionBtn = 'inline-flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white border border-neutral-200 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-500 px-2.5 py-1.5 rounded-lg transition-colors'
 
 type ApiSource = {
   id: number
@@ -113,166 +118,153 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <h1 className="text-2xl font-bold mb-6">{t('settings.title')}</h1>
+    <div className="flex flex-col gap-6 pb-8">
+      <h1 className="text-2xl font-bold">{t('settings.title')}</h1>
 
-      {/* App settings */}
-      <div className="divide-y divide-neutral-200 dark:divide-neutral-800 max-w-lg w-full">
-        <div className="flex items-center justify-between py-4">
-          <span className="text-sm text-neutral-600 dark:text-neutral-300">{t('settings.language')}</span>
-          <select
-            value={i18n.language}
-            onChange={(e) => void i18n.changeLanguage(e.target.value)}
-            className={selectClass}
-          >
-            {LANGUAGES.map(({ code, labelKey }) => (
-              <option key={code} value={code}>{t(labelKey)}</option>
-            ))}
-          </select>
-        </div>
+      {/* Top row: Appearance + Movie Databases side by side */}
+      <div className="grid grid-cols-2 gap-4 items-start">
 
-        <div className="flex items-center justify-between py-4">
-          <span className="text-sm text-neutral-600 dark:text-neutral-300">{t('settings.theme')}</span>
-          <select
-            value={theme}
-            onChange={(e) => setTheme(e.target.value as Theme)}
-            className={selectClass}
-          >
-            {THEMES.map(({ value, labelKey }) => (
-              <option key={value} value={value}>{t(labelKey)}</option>
-            ))}
-          </select>
-        </div>
-      </div>
+        {/* Appearance */}
+        <section className="flex flex-col gap-2">
+          <p className={sectionLabel}>{t('settings.appearance')}</p>
+          <div className={card}>
+            <div className={`${cardRow} border-b border-neutral-100 dark:border-neutral-800`}>
+              <span className="text-sm text-neutral-700 dark:text-neutral-300">{t('settings.language')}</span>
+              <select
+                value={i18n.language}
+                onChange={(e) => void i18n.changeLanguage(e.target.value)}
+                className={selectClass}
+              >
+                {LANGUAGES.map(({ code, labelKey }) => (
+                  <option key={code} value={code}>{t(labelKey)}</option>
+                ))}
+              </select>
+            </div>
+            <div className={cardRow}>
+              <span className="text-sm text-neutral-700 dark:text-neutral-300">{t('settings.theme')}</span>
+              <select
+                value={theme}
+                onChange={(e) => setTheme(e.target.value as Theme)}
+                className={selectClass}
+              >
+                {THEMES.map(({ value, labelKey }) => (
+                  <option key={value} value={value}>{t(labelKey)}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </section>
 
-      {/* Movie databases */}
-      <div className="mt-8">
-        <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">
-          {t('settings.movieApis.title')}
-        </h2>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-neutral-200 dark:border-neutral-800">
-              <th className="text-left font-medium text-neutral-500 dark:text-neutral-400 pb-2 pr-4">
-                {t('settings.movieApis.colName')}
-              </th>
-              <th className="text-left font-medium text-neutral-500 dark:text-neutral-400 pb-2 pr-4">
-                {t('settings.movieApis.colStatus')}
-              </th>
-              <th className="pb-2" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
-            {sources.map(source => {
-              const isConfigured = !source.needsConfiguration || source.apiKey !== null
-              return (
-                <tr key={source.id}>
-                  <td className="py-3 pr-4 text-neutral-900 dark:text-neutral-100 font-medium">
-                    {source.name}
-                  </td>
-                  <td className="py-3 pr-4">
-                    {!source.needsConfiguration ? (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                        {t('settings.movieApis.free')}
+        {/* Movie Databases */}
+        <section className="flex flex-col gap-2">
+          <p className={sectionLabel}>{t('settings.movieApis.title')}</p>
+          <div className={card}>
+            <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
+              {sources.map(source => {
+                const isConfigured = !source.needsConfiguration || source.apiKey !== null
+                return (
+                  <div key={source.id} className={cardRow}>
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                        {source.name}
                       </span>
-                    ) : isConfigured ? (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                        {t('settings.movieApis.configured')}
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-500 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full">
-                        <span className="w-1.5 h-1.5 rounded-full bg-neutral-400" />
-                        {t('settings.movieApis.notConfigured')}
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-3 text-right">
+                      {!source.needsConfiguration ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
+                          <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                          {t('settings.movieApis.free')}
+                        </span>
+                      ) : isConfigured ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
+                          <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                          {t('settings.movieApis.configured')}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full">
+                          <span className="w-1.5 h-1.5 rounded-full bg-neutral-400" />
+                          {t('settings.movieApis.notConfigured')}
+                        </span>
+                      )}
+                    </div>
                     {source.needsConfiguration && (
-                      <button
-                        onClick={() => openModal(source)}
-                        className="inline-flex items-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white border border-neutral-200 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-500 px-2.5 py-1 rounded-lg transition-colors"
-                      >
+                      <button onClick={() => openModal(source)} className={actionBtn}>
                         <Settings2 size={12} />
                         {t('settings.movieApis.configure')}
                       </button>
                     )}
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </section>
       </div>
 
-      {/* Scan folders */}
-      <div className="mt-8">
-        <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">
-          {t('settings.scanFolders.title')}
-        </h2>
-        {folders.length === 0 ? (
-          <p className="text-sm text-neutral-400 dark:text-neutral-500 mb-3">
-            {t('settings.scanFolders.empty')}
-          </p>
-        ) : (
-          <table className="w-full text-sm mb-3">
-            <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
-              {folders.map(folder => (
-                <tr key={folder.id}>
-                  <td className="py-2.5 pr-4 text-neutral-700 dark:text-neutral-300 font-mono text-xs truncate max-w-0 w-full">
+      {/* Scan Folders — full width */}
+      <section className="flex flex-col gap-2">
+        <p className={sectionLabel}>{t('settings.scanFolders.title')}</p>
+        <div className={card}>
+          <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
+            {folders.length === 0 ? (
+              <div className="px-4 py-3 text-sm text-neutral-400 dark:text-neutral-500">
+                {t('settings.scanFolders.empty')}
+              </div>
+            ) : (
+              folders.map(folder => (
+                <div key={folder.id} className="flex items-center gap-3 px-4 py-3 group">
+                  <FolderOpen size={14} className="text-neutral-400 dark:text-neutral-500 shrink-0" />
+                  <span className="flex-1 font-mono text-xs text-neutral-600 dark:text-neutral-400 truncate">
                     {folder.path}
-                  </td>
-                  <td className="py-2.5 text-right shrink-0">
-                    <button
-                      onClick={() => void removeFolder(folder.id)}
-                      className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-                    >
-                      <Trash2 size={13} />
-                      {t('settings.scanFolders.remove')}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-        <button
-          onClick={() => void addFolder()}
-          className="inline-flex items-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white border border-neutral-200 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-500 px-2.5 py-1.5 rounded-lg transition-colors"
-        >
-          <FolderPlus size={13} />
-          {t('settings.scanFolders.add')}
-        </button>
-      </div>
-
-      {/* Data directory */}
-      {appConfig && (
-        <div className="mt-8">
-          <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
-            {t('settings.dataDir.title')}
-          </h2>
-          <p className="text-xs text-neutral-400 dark:text-neutral-500 mb-3">
-            {t('settings.dataDir.description')}
-          </p>
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-xs text-neutral-600 dark:text-neutral-400 truncate">
-              {appConfig.dataDir}
-            </span>
-            <button
-              onClick={() => void changeDataDir()}
-              className="shrink-0 inline-flex items-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white border border-neutral-200 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-500 px-2.5 py-1.5 rounded-lg transition-colors"
-            >
-              <FolderOpen size={13} />
-              {t('settings.dataDir.change')}
-            </button>
+                  </span>
+                  <button
+                    onClick={() => void removeFolder(folder.id)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1 text-xs text-neutral-400 hover:text-red-500 dark:hover:text-red-400"
+                  >
+                    <Trash2 size={13} />
+                    {t('settings.scanFolders.remove')}
+                  </button>
+                </div>
+              ))
+            )}
+            <div className="px-4 py-2.5 bg-neutral-50 dark:bg-neutral-800/40">
+              <button
+                onClick={() => void addFolder()}
+                className="inline-flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors"
+              >
+                <FolderPlus size={13} />
+                {t('settings.scanFolders.add')}
+              </button>
+            </div>
           </div>
         </div>
+      </section>
+
+      {/* Data Directory — full width */}
+      {appConfig && (
+        <section className="flex flex-col gap-2">
+          <div className="flex items-baseline gap-3">
+            <p className={sectionLabel}>{t('settings.dataDir.title')}</p>
+            <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mb-2">
+              {t('settings.dataDir.description')}
+            </p>
+          </div>
+          <div className={card}>
+            <div className="flex items-center gap-3 px-4 py-3">
+              <HardDrive size={14} className="text-neutral-400 dark:text-neutral-500 shrink-0" />
+              <span className="flex-1 font-mono text-xs text-neutral-600 dark:text-neutral-400 truncate">
+                {appConfig.dataDir}
+              </span>
+              <button onClick={() => void changeDataDir()} className={actionBtn}>
+                <FolderOpen size={13} />
+                {t('settings.dataDir.change')}
+              </button>
+            </div>
+          </div>
+        </section>
       )}
 
       {/* Restart notice */}
       {restartRequired && (
-        <div className="mt-6 flex items-center gap-3 px-4 py-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+        <div className="flex items-center gap-3 px-4 py-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
           <span className="text-xs text-amber-700 dark:text-amber-300 flex-1">
             {t('settings.dataDir.restartNotice')}
           </span>
@@ -285,6 +277,8 @@ export function SettingsPage() {
           </button>
         </div>
       )}
+
+      <div className="h-8 shrink-0" />
 
       {/* Configure modal */}
       {modal && (
