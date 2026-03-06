@@ -164,6 +164,10 @@ export function LibraryPage() {
                 className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 rounded-lg" />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-2 pb-2 pt-8 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                <p className="text-white text-xs font-semibold leading-tight truncate">{movie.title}</p>
+                {movie.year && <p className="text-white/60 text-xs">{movie.year}</p>}
+              </div>
             </div>
           ))}
         </div>
