@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ChevronUp, Search, X } from 'lucide-react'
+import { ChevronUp, Search, X, Eye, EyeOff } from 'lucide-react'
 import { api, resolvePosterUrl } from '../../lib/api'
 import { MovieModal } from '../../components/MovieModal'
 import { logger } from '../../lib/logger'
@@ -49,7 +49,17 @@ export function LibraryPage() {
   const [selectedMovie, setSelectedMovie] = useState<MovieItem | null>(null)
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [query, setQuery] = useState('')
+  const [togglingIds, setTogglingIds] = useState<Set<number>>(new Set())
   const searchRef = useRef<HTMLInputElement>(null)
+
+  async function toggleWatched(e: React.MouseEvent, movie: MovieItem) {
+    e.stopPropagation()
+    if (togglingIds.has(movie.id)) return
+    setTogglingIds(prev => new Set(prev).add(movie.id))
+    const result = await api.movies[String(movie.id)].patch({ watched: !movie.watched })
+    if (result.data) setMovies(ms => ms.map(m => m.id === movie.id ? { ...m, ...result.data } : m))
+    setTogglingIds(prev => { const next = new Set(prev); next.delete(movie.id); return next })
+  }
 
   useEffect(() => {
     const main = document.querySelector('main')
@@ -164,6 +174,27 @@ export function LibraryPage() {
                 className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 rounded-lg" />
+              {/* Watched indicator — always visible */}
+              {movie.watched && (
+                <div className="absolute top-1.5 right-1.5 p-1 rounded-full bg-green-500/90">
+                  <Eye size={10} className="text-white" />
+                </div>
+              )}
+              {/* Toggle button — on hover */}
+              <button
+                onClick={e => void toggleWatched(e, movie)}
+                disabled={togglingIds.has(movie.id)}
+                className={`absolute top-1.5 right-1.5 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer ${
+                  movie.watched
+                    ? 'bg-green-500/90 hover:bg-red-500/90'
+                    : 'bg-black/50 hover:bg-green-500/90'
+                }`}
+              >
+                {movie.watched
+                  ? <EyeOff size={11} className="text-white" />
+                  : <Eye size={11} className="text-white" />
+                }
+              </button>
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-2 pb-2 pt-8 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
                 <p className="text-white text-xs font-semibold leading-tight truncate">{movie.title}</p>
                 {movie.year && <p className="text-white/60 text-xs">{movie.year}</p>}
