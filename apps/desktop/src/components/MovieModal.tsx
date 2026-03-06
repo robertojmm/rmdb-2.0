@@ -6,22 +6,28 @@ import { openPath } from '@tauri-apps/plugin-opener'
 function StarRating({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [hovered, setHovered] = useState<number | null>(null)
   const current = hovered ?? (value ? Number(value) : 0)
+  const displayed = hovered ?? (value ? Number(value) : null)
   return (
-    <div className="flex gap-0.5" onMouseLeave={() => setHovered(null)}>
-      {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-        <button
-          key={n}
-          type="button"
-          onMouseEnter={() => setHovered(n)}
-          onClick={() => onChange(n === Number(value) ? '' : String(n))}
-          className="text-neutral-300 dark:text-neutral-600 hover:scale-110 transition-transform"
-        >
-          <Star
-            size={16}
-            className={n <= current ? 'fill-yellow-400 text-yellow-400' : ''}
-          />
-        </button>
-      ))}
+    <div className="flex items-center gap-2" onMouseLeave={() => setHovered(null)}>
+      <div className="flex gap-0.5">
+        {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+          <button
+            key={n}
+            type="button"
+            onMouseEnter={() => setHovered(n)}
+            onClick={() => onChange(n === Number(value) ? '' : String(n))}
+            className="text-neutral-300 dark:text-neutral-600 hover:scale-110 transition-transform cursor-pointer"
+          >
+            <Star
+              size={16}
+              className={n <= current ? 'fill-yellow-400 text-yellow-400' : ''}
+            />
+          </button>
+        ))}
+      </div>
+      <span className="text-xs text-neutral-400 tabular-nums w-8 shrink-0">
+        {displayed != null ? `${displayed}/10` : ''}
+      </span>
     </div>
   )
 }
