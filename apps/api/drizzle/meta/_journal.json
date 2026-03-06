@@ -36,6 +36,13 @@
       "when": 1772640000000,
       "tag": "0004_add_movies_watched",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1772811215914,
+      "tag": "0005_add_movies_watched_at",
+      "breakpoints": true
     }
   ]
 }

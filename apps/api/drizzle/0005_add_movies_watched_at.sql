@@ -1,0 +1,1 @@
+ALTER TABLE `movies` ADD `watched_at` integer;
