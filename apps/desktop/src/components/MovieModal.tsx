@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { X, Star, Calendar, Clock, Film, Pencil, Check, Trash2, FolderOpen, Play, Eye, EyeOff } from 'lucide-react'
+import { X, Star, Calendar, Clock, Film, Pencil, Check, Trash2, FolderOpen, Play, Loader2, Eye, EyeOff } from 'lucide-react'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openPath } from '@tauri-apps/plugin-opener'
 
@@ -57,6 +57,7 @@ export function MovieModal({ movieId, initialMovie, onClose, onDelete, onUpdate 
   const [movie, setMovie] = useState<MovieDetail>(initialMovie)
   const [isEditing, setIsEditing] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [launching, setLaunching] = useState(false)
   const [form, setForm] = useState<MovieForm>({
     title: '',
     originalTitle: '',
@@ -228,20 +229,25 @@ export function MovieModal({ movieId, initialMovie, onClose, onDelete, onUpdate 
             <div className="flex items-center justify-between mt-auto pt-2">
               <div className="flex items-center gap-3 min-w-0">
                 <button
-                  onClick={() => {
-                    console.log('[play] filePath:', movie.filePath)
-                    if (movie.filePath) {
-                      openPath(movie.filePath)
-                        .then(() => console.log('[play] openPath OK'))
-                        .catch((e) => console.error('[play] openPath ERROR:', e))
+                  onClick={async () => {
+                    if (!movie.filePath || launching) return
+                    setLaunching(true)
+                    try {
+                      await openPath(movie.filePath)
+                    } catch (e) {
+                      console.error('[play] openPath ERROR:', e)
                     }
+                    setTimeout(() => setLaunching(false), 1500)
                   }}
-                  disabled={!movie.filePath}
+                  disabled={!movie.filePath || launching}
                   title={movie.filePath ? 'Play' : 'No file associated'}
-                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                 >
-                  <Play size={12} />
-                  Play
+                  {launching
+                    ? <Loader2 size={12} className="animate-spin" />
+                    : <Play size={12} />
+                  }
+                  {launching ? 'Opening...' : 'Play'}
                 </button>
                 {movie.filePath && (
                   <p className="flex items-center gap-1.5 text-xs text-neutral-400 truncate min-w-0">
