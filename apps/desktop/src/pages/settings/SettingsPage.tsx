@@ -138,7 +138,7 @@ export function SettingsPage() {
               <span className="text-sm text-neutral-700 dark:text-neutral-300">{t('settings.language')}</span>
               <select
                 value={i18n.language}
-                onChange={(e) => void i18n.changeLanguage(e.target.value)}
+                onChange={(e) => { localStorage.setItem('language', e.target.value); void i18n.changeLanguage(e.target.value) }}
                 className={selectClass}
               >
                 {LANGUAGES.map(({ code, labelKey }) => (
