@@ -1,7 +1,7 @@
 import { Elysia } from 'elysia'
 import { db } from '@db'
 import { movies } from '@db/schema'
-import { count, avg, sql, isNotNull } from 'drizzle-orm'
+import { count, avg, sql, isNotNull, desc } from 'drizzle-orm'
 
 export const statsRouter = new Elysia({ prefix: '/stats' })
   .get('/', async () => {
@@ -34,6 +34,32 @@ export const statsRouter = new Elysia({ prefix: '/stats' })
       .groupBy(sql`ROUND(${movies.rating})`)
       .orderBy(sql`ROUND(${movies.rating})`)
 
+    const topRated = await db
+      .select({
+        id: movies.id,
+        title: movies.title,
+        year: movies.year,
+        rating: movies.rating,
+        posterPath: movies.posterPath,
+      })
+      .from(movies)
+      .where(isNotNull(movies.rating))
+      .orderBy(desc(movies.rating))
+      .limit(5)
+
+    const recentlyWatched = await db
+      .select({
+        id: movies.id,
+        title: movies.title,
+        year: movies.year,
+        watchedAt: movies.watchedAt,
+        posterPath: movies.posterPath,
+      })
+      .from(movies)
+      .where(isNotNull(movies.watchedAt))
+      .orderBy(desc(movies.watchedAt))
+      .limit(5)
+
     return {
       total: totals?.total ?? 0,
       watched: Number(totals?.watched ?? 0),
@@ -41,5 +67,7 @@ export const statsRouter = new Elysia({ prefix: '/stats' })
       avgRating: totals?.avgRating != null ? Math.round(Number(totals.avgRating) * 10) / 10 : null,
       byDecade: byDecade.map(r => ({ decade: Number(r.decade), count: r.count })),
       byRating: byRating.map(r => ({ rating: Number(r.rating), count: r.count })),
+      topRated,
+      recentlyWatched,
     }
   })

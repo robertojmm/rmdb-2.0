@@ -38,7 +38,12 @@ export const moviesRouter = new Elysia({ prefix: '/movies' })
   )
   .patch(
     '/:id',
-    ({ params, body }) => moviesService.update(Number(params.id), body),
+    ({ params, body }) => {
+      const update = { ...body }
+      if (body.watched === true) Object.assign(update, { watchedAt: new Date() })
+      else if (body.watched === false) Object.assign(update, { watchedAt: null })
+      return moviesService.update(Number(params.id), update)
+    },
     {
       body: t.Object({
         title: t.Optional(t.String()),

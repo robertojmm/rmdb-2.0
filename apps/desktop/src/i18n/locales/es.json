@@ -104,6 +104,8 @@
     "ofTotal": "del total",
     "byDecade": "Películas por década",
     "ratingDist": "Distribución de valoraciones",
+    "topRated": "Mejor valoradas",
+    "recentlyWatched": "Vistas recientemente",
     "noData": "Sin datos aún."
   },
   "settings": {

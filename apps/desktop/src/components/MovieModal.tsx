@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { X, Star, Calendar, Film, Pencil, Check, Trash2, FolderOpen, Play, Eye, EyeOff } from 'lucide-react'
+import { X, Star, Calendar, Clock, Film, Pencil, Check, Trash2, FolderOpen, Play, Eye, EyeOff } from 'lucide-react'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openPath } from '@tauri-apps/plugin-opener'
 
@@ -211,6 +211,12 @@ export function MovieModal({ movieId, initialMovie, onClose, onDelete, onUpdate 
                 {movie.watched ? <Eye size={12} /> : <EyeOff size={12} />}
                 {movie.watched ? 'Watched' : 'Unwatched'}
               </button>
+              {movie.watched && movie.watchedAt && (
+                <span className="flex items-center gap-1 text-xs text-neutral-400">
+                  <Clock size={12} />
+                  {new Date(movie.watchedAt).toLocaleDateString()}
+                </span>
+              )}
             </div>
 
             {movie.overview && (

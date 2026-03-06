@@ -104,6 +104,8 @@
     "ofTotal": "of total",
     "byDecade": "Movies by decade",
     "ratingDist": "Rating distribution",
+    "topRated": "Top rated",
+    "recentlyWatched": "Recently watched",
     "noData": "No data yet."
   },
   "settings": {
