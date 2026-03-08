@@ -6,6 +6,7 @@ import { ApiSourceSelect, type ApiSource } from './ApiSourceSelect'
 import { MovieDraftModal } from './MovieDraftModal'
 import { api, API_URL } from '../../lib/api'
 import { logger } from '../../lib/logger'
+import { PosterImage, toThumbnailUrl } from '../../components/PosterImage'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -352,14 +353,11 @@ export function ScanPanel() {
           </p>
 
           <div className="flex gap-4 p-4 bg-neutral-50 dark:bg-neutral-800 rounded-xl">
-            <div className="shrink-0 w-20 h-28 rounded-lg overflow-hidden bg-neutral-200 dark:bg-neutral-700">
-              <img
-                src={currentReviewItem.match.posterUrl ?? `${API_URL}/assets/default_poster`}
-                alt={currentReviewItem.match.title}
-                decoding="async"
-                className="w-full h-full object-cover"
-              />
-            </div>
+            <PosterImage
+              src={currentReviewItem.match.posterUrl ?? `${API_URL}/assets/default_poster`}
+              alt={currentReviewItem.match.title}
+              className="w-20 h-28"
+            />
             <div className="flex flex-col gap-1 min-w-0 flex-1">
               <p className="font-semibold text-neutral-900 dark:text-white truncate">
                 {currentReviewItem.match.title}
@@ -527,7 +525,7 @@ function ChoosingView({ identified, unidentified, onAutoAdd, onStartReview, onGo
     identified.forEach(item => {
       if (item.match.posterUrl) {
         const img = new window.Image()
-        img.src = item.match.posterUrl
+        img.src = toThumbnailUrl(item.match.posterUrl)
       }
     })
   }, [identified])
@@ -547,14 +545,11 @@ function ChoosingView({ identified, unidentified, onAutoAdd, onStartReview, onGo
           <ul className="flex flex-col gap-1.5">
             {identifiedPageItems.map((item, i) => (
               <li key={i} className="flex items-center gap-3 px-3 py-2 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
-                <div className="shrink-0 w-8 h-11 rounded overflow-hidden bg-neutral-200 dark:bg-neutral-700">
-                  <img
-                    src={item.match.posterUrl ?? `${API_URL}/assets/default_poster`}
-                    alt={item.match.title}
-                    decoding="async"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+                <PosterImage
+                  src={item.match.posterUrl ?? `${API_URL}/assets/default_poster`}
+                  alt={item.match.title}
+                  className="w-8 h-11 rounded"
+                />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 truncate">
                     {item.match.title}

@@ -5,6 +5,7 @@ import { api, API_URL } from '../../lib/api'
 import { getLastApiSource, saveLastApiSource } from '../../lib/preferences'
 import { ApiSourceSelect, type ApiSource } from './ApiSourceSelect'
 import { MovieDraftModal } from './MovieDraftModal'
+import { PosterImage } from '../../components/PosterImage'
 
 export type SearchResult = NonNullable<
   Awaited<ReturnType<typeof api['api-sources'][string]['search']['get']>>['data']
@@ -96,11 +97,9 @@ export function ApiPanel() {
                   key={movie.externalId}
                   className="flex gap-3 p-3 bg-neutral-50 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700"
                 >
-                  <img
+                  <PosterImage
                     src={movie.posterUrl ?? `${API_URL}/assets/default_poster`}
                     alt={movie.title}
-                    decoding="async"
-                    className="w-10 h-14 object-cover rounded-lg shrink-0 bg-neutral-200 dark:bg-neutral-700"
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate">{movie.title}</p>
