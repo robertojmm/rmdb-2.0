@@ -129,8 +129,43 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .setup(|app| {
             init_config(app.handle());
+            let cfg = read_config(app.handle());
+            let data_dir = PathBuf::from(&cfg.data_dir);
+            let config_path = config_file_path(app.handle());
+
+            let exe_dir = std::env::current_exe()
+                .ok()
+                .and_then(|p| p.parent().map(|d| d.to_path_buf()))
+                .unwrap_or_default();
+            let api_name = if cfg!(windows) { "rmdb-api.exe" } else { "rmdb-api" };
+            let api_path = exe_dir.join(api_name);
+
+            if api_path.exists() {
+                let log_path = data_dir.join("api.log");
+                let log_file = std::fs::OpenOptions::new()
+                    .create(true)
+                    .append(true)
+                    .open(&log_path);
+
+                let mut cmd = std::process::Command::new(&api_path);
+                cmd.current_dir(&exe_dir);
+                cmd.env("CONFIG_PATH", config_path.to_string_lossy().as_ref());
+                // Help Bun resolve --external=sharp from node_modules alongside the binary
+                cmd.env("NODE_PATH", exe_dir.join("node_modules").to_string_lossy().as_ref());
+                if let Ok(file) = log_file {
+                    if let Ok(err_file) = file.try_clone() {
+                        cmd.stdout(std::process::Stdio::from(file));
+                        cmd.stderr(std::process::Stdio::from(err_file));
+                    }
+                }
+                let _ = cmd.spawn();
+            } else {
+                eprintln!("[api] not found at {}", api_path.display());
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { PerfOverlay } from './PerfOverlay'
 import { ErrorBoundary } from '../ErrorBoundary'
+import { UpdateBanner } from '../UpdateBanner'
 
 export function Layout() {
   return (
@@ -13,6 +14,7 @@ export function Layout() {
         </ErrorBoundary>
       </main>
       <PerfOverlay />
+      <UpdateBanner />
     </div>
   )
 }

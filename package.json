@@ -14,6 +14,7 @@
     "desktop:dev": "bun run --cwd apps/desktop tauri dev",
     "desktop:web": "bun run --cwd apps/desktop dev",
     "desktop:build": "bun run --cwd apps/desktop tauri build",
+    "release:build": "bun scripts/build-sidecar.ts && bun run desktop:build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
