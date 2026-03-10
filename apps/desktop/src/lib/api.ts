@@ -1,9 +1,17 @@
 import { treaty } from '@elysiajs/eden'
 import type { App } from '@some-project/api'
 
-export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
+export let API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
+export let api = treaty<App>(API_URL)
 
-export const api = treaty<App>(API_URL)
+export function initApiUrl(url: string) {
+  API_URL = url
+  api = treaty<App>(url)
+}
+
+export function getApiUrl(): string {
+  return API_URL
+}
 
 export type PosterSize = 'small' | 'medium' | 'big'
 

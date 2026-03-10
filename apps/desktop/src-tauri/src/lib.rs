@@ -2,11 +2,17 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use tauri::Manager;
 
+fn default_api_url() -> String {
+    "http://localhost:3000".to_string()
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 struct AppConfig {
     db_path: String,
     data_dir: String,
+    #[serde(default = "default_api_url")]
+    api_url: String,
 }
 
 fn config_file_path<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> PathBuf {
@@ -24,6 +30,7 @@ fn default_config<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> AppConfig {
     AppConfig {
         db_path: data_dir.join("rmdb.sqlite").to_string_lossy().into_owned(),
         data_dir: data_dir.to_string_lossy().into_owned(),
+        api_url: default_api_url(),
     }
 }
 
@@ -46,6 +53,7 @@ fn init_config<R: tauri::Runtime>(app: &tauri::AppHandle<R>) {
         println!("[config] Loaded from config file: {}", config_path.display());
         println!("[config] DB path: {}", cfg.db_path);
         println!("[config] Data dir: {}", cfg.data_dir);
+        println!("[config] Api url: {}", cfg.api_url);
     } else {
         let cfg = default_config(app);
         match write_config(app, &cfg) {
@@ -54,6 +62,7 @@ fn init_config<R: tauri::Runtime>(app: &tauri::AppHandle<R>) {
         }
         println!("[config] DB path: {}", cfg.db_path);
         println!("[config] Data dir: {}", cfg.data_dir);
+        println!("[config] Api url: {}", cfg.api_url);
     }
 }
 
@@ -97,9 +106,11 @@ fn set_data_dir(app: tauri::AppHandle, new_dir: String, move_files: bool, curren
 
     // Write config before attempting deletion — on Windows, Bun may hold the file
     // open, causing remove_file to fail. Config must be saved regardless.
+    let current = read_config(&app);
     let new_config = AppConfig {
         db_path: new_db_path.to_string_lossy().into_owned(),
         data_dir: new_dir,
+        api_url: current.api_url,
     };
     write_config(&app, &new_config)?;
 
@@ -129,8 +140,44 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .setup(|app| {
             init_config(app.handle());
+            let cfg = read_config(app.handle());
+            let data_dir = PathBuf::from(&cfg.data_dir);
+            let config_path = config_file_path(app.handle());
+
+            let exe_dir = std::env::current_exe()
+                .ok()
+                .and_then(|p| p.parent().map(|d| d.to_path_buf()))
+                .unwrap_or_default();
+            let api_name = if cfg!(windows) { "rmdb-api.exe" } else { "rmdb-api" };
+            let api_path = exe_dir.join(api_name);
+
+            if api_path.exists() {
+                let log_path = data_dir.join("api.log");
+                let log_file = std::fs::OpenOptions::new()
+                    .create(true)
+                    .append(true)
+                    .open(&log_path);
+
+                let mut cmd = std::process::Command::new(&api_path);
+                cmd.current_dir(&exe_dir);
+                cmd.env("CONFIG_PATH", config_path.to_string_lossy().as_ref());
+                cmd.env("API_URL", &cfg.api_url);
+                // Help Bun resolve --external=sharp from node_modules alongside the binary
+                cmd.env("NODE_PATH", exe_dir.join("node_modules").to_string_lossy().as_ref());
+                if let Ok(file) = log_file {
+                    if let Ok(err_file) = file.try_clone() {
+                        cmd.stdout(std::process::Stdio::from(file));
+                        cmd.stderr(std::process::Stdio::from(err_file));
+                    }
+                }
+                let _ = cmd.spawn();
+            } else {
+                eprintln!("[api] not found at {}", api_path.display());
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

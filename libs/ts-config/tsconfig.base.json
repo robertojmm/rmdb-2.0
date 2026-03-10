@@ -60,9 +60,5 @@
     "noEmit": true,
 
 
-    "paths": {
-      "@apps/*": ["apps/*"],
-      "@libs/*": ["libs/*"],
-    }
   }
 }

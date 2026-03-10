@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "appsdesktop",
-  "version": "0.1.0",
+  "productName": "rmdb2",
+  "version": "0.1.2",
   "identifier": "com.rmdb.desktop",
   "build": {
     "beforeDevCommand": "bun run dev",
@@ -21,9 +21,22 @@
       "csp": null
     }
   },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDVFNTJFRTA0N0NFOEM1OTcKUldTWHhlaDhCTzVTWHIrSFdrWFZYenF6YVU1SmpIdXEvaFc1S2NBVzZHUkkrTnNwM1U5clNHSisK",
+      "endpoints": [
+        "https://github.com/robertojmm/rmdb-2.0/releases/latest/download/latest.json"
+      ]
+    }
+  },
   "bundle": {
     "active": true,
     "targets": "all",
+    "resources": [
+      "binaries/rmdb-api*",
+      "binaries/node_modules/**/*",
+      "binaries/drizzle/**/*"
+    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
