@@ -11,6 +11,7 @@ import { postersDir } from '@movies/poster.service'
 import { version } from '../package.json'
 import { config } from './config'
 import { logger } from './logger'
+import './seeds'
 
 const app = new Elysia()
   .use(cors({
@@ -54,10 +55,11 @@ const app = new Elysia()
   .use(scanRouter)
   .use(movieDraftsRouter)
   .use(statsRouter)
-  .listen({
-    hostname: "0.0.0.0",
-    port: 3000
-  })
+  .listen((() => {
+    const raw = process.env.API_URL ?? 'http://localhost:3000'
+    const parsed = new URL(raw)
+    return { hostname: parsed.hostname || '0.0.0.0', port: parseInt(parsed.port || '3000', 10) }
+  })())
 
 logger.info(`API version ${version} started on http://${app.server?.hostname}:${app.server?.port}`)
 console.log(`API version ${version} running at http://${app.server?.hostname}:${app.server?.port}`)
